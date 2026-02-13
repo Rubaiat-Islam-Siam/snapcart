@@ -16,7 +16,7 @@ const HeroSection = () => {
     subtitle:
       "Farm-fresh fruits, vegetables, and daily essentials delivered to you.",
     btnText: "Shop Now",
-    bg: "https://images.unsplash.com/photo-1516594798947-e65505dbb29d?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8ZnJlc2glMjBwcm9kdWNlfGVufDB8fDB8fHww",
+    bg: "https://images.unsplash.com/photo-1617692913859-e492ea72afb7?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
   },
   {
     id: 2,
