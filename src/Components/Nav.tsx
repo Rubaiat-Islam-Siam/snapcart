@@ -4,7 +4,6 @@ import {
   LogOut,
   Package,
   Search,
-  SearchAlertIcon,
   ShoppingCart,
   User,
   X,
@@ -109,7 +108,7 @@ const Nav = ({ user }: { user: IUser }) => {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: -10, scale: 0.95 }}
                 transition={{ duration: 0.2, ease: "easeOut" }}
-                className="absolute right-0 mt-3 w-56 bg-white rounded-2xl shadow-xl border border-gray-200 p-2 z-[999]"
+                className="absolute right-0 mt-3 w-64 bg-white rounded-2xl shadow-xl border border-gray-200 p-2 z-[999]"
               >
                 <div className="flex items-center gap-3 px-3 py-3 border-b border-gray-100">
                   <div className="w-10 h-10 rounded-full bg-green-100 relative overflow-hidden">
@@ -130,7 +129,7 @@ const Nav = ({ user }: { user: IUser }) => {
                 </div>
 
                 <Link
-                  href="/orders"
+                  href=""
                   onClick={() => setOpen(false)}
                   className="flex items-center gap-2 px-3 py-3 hover:bg-green-50 rounded-lg"
                 >

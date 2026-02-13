@@ -4,6 +4,9 @@ import connectDb from "../lib/db";
 import User from "../models/user.model";
 import EditRoleMobile from "../Components/EditRoleMobile";
 import Nav from "../Components/Nav";
+import UserDashboard from "../Components/UserDashboard";
+import AdminDashboard from "../Components/AdminDashboard";
+import DeliveryDashboad from "../Components/DeliveryDashboad";
 
 
 export default async function Home() {
@@ -22,6 +25,13 @@ export default async function Home() {
   return (
     <div>
        <Nav user={plainUser}/>
+       {user.role == "user"?(
+        <UserDashboard/>
+       ):
+        user.role=="admin"?(
+          <AdminDashboard/>
+        ) : <DeliveryDashboad/>
+       }
     </div>
   );
 }
