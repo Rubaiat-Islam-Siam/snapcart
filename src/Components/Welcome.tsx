@@ -10,7 +10,7 @@ type propType = {
 
 const Welcome = ({nextStep}:propType) => {
   return (
-    <div className='flex flex-col justify-center items-center min-h-screen text-center p-6'>
+    <div className='flex flex-col justify-center items-center min-h-screen text-center p-6 bg-linear-to-b from-green-100 to-white'>
         <motion.div
             initial= {{
                 opacity:0,
