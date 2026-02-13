@@ -3,6 +3,7 @@ import { auth } from "../auth";
 import connectDb from "../lib/db";
 import User from "../models/user.model";
 import EditRoleMobile from "../Components/EditRoleMobile";
+import Nav from "../Components/Nav";
 
 
 export default async function Home() {
@@ -16,9 +17,11 @@ export default async function Home() {
 
   if(inComplete)
     return <EditRoleMobile/>
+
+  const plainUser = JSON.parse(JSON.stringify(user))
   return (
     <div>
-       
+       <Nav user={plainUser}/>
     </div>
   );
 }
