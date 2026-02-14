@@ -11,8 +11,7 @@ import {
 } from "lucide-react"
 import React, { useState } from "react"
 import { motion } from "framer-motion"
-import axios from "axios"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { signIn, useSession } from "next-auth/react"
 
 
@@ -21,31 +20,40 @@ const LoginPage = () => {
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
   const session = useSession()
   console.log(session)
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const callbackUrl = searchParams.get("callbackUrl") || "/"
 
   const isValid = email.trim() !== "" && password.trim() !== ""
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
+    setError("")
 
     try {
-       await signIn("credentials",{
-        email,password
+       const result = await signIn("credentials",{
+        email,
+        password,
+        redirect: false,
+        callbackUrl
        })
-       router.push("/")
+       
+       if (result?.error) {
+         setError(result.error)
+       } else if (result?.ok) {
+         router.push(callbackUrl)
+         router.refresh()
+       }
     } catch (err) {
       console.log(err)
+      setError("An unexpected error occurred")
     } finally {
       setLoading(false)
     }
-  }
-
-  const handleGoogleLogin = () => {
-    console.log("Google login")
-    // signIn("google")
   }
 
   return (
@@ -70,6 +78,13 @@ const LoginPage = () => {
         onSubmit={handleLogin}
         className="flex flex-col gap-5 w-full max-w-sm"
       >
+
+        {/* Error Message */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
+            {error}
+          </div>
+        )}
 
         {/* Email */}
         <div className="relative">

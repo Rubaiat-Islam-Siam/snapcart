@@ -22,6 +22,7 @@ export default async function Home() {
     return <EditRoleMobile/>
 
   const plainUser = JSON.parse(JSON.stringify(user))
+  console.log(plainUser)
   return (
     <div>
        <Nav user={plainUser}/>

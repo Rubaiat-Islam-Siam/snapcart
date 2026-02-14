@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  LogOut,
-  Package,
-  Search,
-  ShoppingCart,
-  User,
-  X,
-} from "lucide-react";
+import { LogOut, Package, Search, ShoppingCart, User, X } from "lucide-react";
 import mongoose from "mongoose";
 import Image from "next/image";
 import Link from "next/link";
@@ -111,13 +104,19 @@ const Nav = ({ user }: { user: IUser }) => {
                 className="absolute right-0 mt-3 w-64 bg-white rounded-2xl shadow-xl border border-gray-200 p-2 z-[999]"
               >
                 <div className="flex items-center gap-3 px-3 py-3 border-b border-gray-100">
-                  <div className="w-10 h-10 rounded-full bg-green-100 relative overflow-hidden">
+                  <div className="w-10 h-10 rounded-full bg-green-100 relative overflow-hidden flex items-center justify-center border border-green-200">
                     {user.image ? (
-                      <Image src={user.image} alt="user" fill />
+                      <Image
+                        src={user.image}
+                        alt="user"
+                        fill
+                        className="object-cover"
+                      />
                     ) : (
-                      <User />
+                      <User className="h-5 w-5 text-green-500" />
                     )}
                   </div>
+
                   <div>
                     <div className="font-semibold text-gray-800">
                       {user.name}

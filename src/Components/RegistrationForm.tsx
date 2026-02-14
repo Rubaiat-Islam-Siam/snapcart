@@ -27,30 +27,46 @@ const RegistrationForm = ({ prevStep }: PropType) => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState("");
   const router = useRouter()
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError("");
     try {
-      const result = await axios.post("/api/auth/register", {
+      await axios.post("/api/auth/register", {
         name,
         email,
         password,
       });
-      router.push("/login")
-      setLoading(false);
-    } catch (error) {
+      
+      // Auto sign-in after successful registration
+      const signInResult = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+        callbackUrl: "/"
+      });
+      
+      if (signInResult?.ok) {
+        router.push("/");
+        router.refresh();
+      } else {
+        router.push("/login");
+      }
+    } catch (error: unknown) {
       console.log(error);
+      const errorMessage = error instanceof Error ? error.message : 
+        (typeof error === 'object' && error !== null && 'response' in error) 
+          ? ((error as { response?: { data?: { message?: string } } }).response?.data?.message || "Registration failed")
+          : "Registration failed";
+      setError(errorMessage);
+    } finally {
       setLoading(false);
     }
   };
   const formValidation =
     name.trim() !== "" && email.trim() !== "" && password.trim() !== "";
-
-  const handleGoogleSignup = () => {
-    console.log("Google signup clicked");
-    // later: signIn("google")
-  };
 
   return (
     <div className="flex flex-col justify-center items-center min-h-screen px-6 py-10 bg-white relative">
@@ -82,6 +98,13 @@ const RegistrationForm = ({ prevStep }: PropType) => {
         className="flex flex-col gap-5 w-full max-w-sm"
         onSubmit={handleRegister}
       >
+        {/* Error Message */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
+            {error}
+          </div>
+        )}
+
         {/* Name */}
         <div className="relative">
           <User className="absolute w-5 h-5 top-3.5 left-3 text-gray-400" />
