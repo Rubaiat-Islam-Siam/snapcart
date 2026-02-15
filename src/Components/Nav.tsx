@@ -23,7 +23,9 @@ const Nav = ({ user }: { user: IUser }) => {
   const [open, setOpen] = useState(false);
   const [searchBarOpen, setSearchBarOpen] = useState(false);
   const [menuOpen,setMenuOpen] = useState(false)
+  const [loading,setLoading] = useState(false)
   const profileDropDown = useRef<HTMLDivElement>(null);
+  
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -72,7 +74,7 @@ const Nav = ({ user }: { user: IUser }) => {
         </div>
 
         <div className="flex flex-col gap-3 font-medium mt-6">
-            <Link href={""} className="flex items-center gap-3 p-3  bg-white/10 rounded-lg hover:bg-white/20 hover:pl-4 transition-all"><Plus className='w-5 h-5'/> Add Grocery</Link>
+            <Link href={"/admin/add-grocery"} className="flex items-center gap-3 p-3  bg-white/10 rounded-lg hover:bg-white/20 hover:pl-4 transition-all"><Plus className='w-5 h-5'/> Add Grocery</Link>
             <Link href={""} className="flex items-center gap-3 p-3  bg-white/10 rounded-lg hover:bg-white/20 hover:pl-4 transition-all"><Boxes className='w-5 h-5'/> View Grocery</Link>
             <Link href={""} className="flex items-center gap-3 p-3  bg-white/10 rounded-lg hover:bg-white/20 hover:pl-4 transition-all"><ClipboardCheck className='w-5 h-5'/> Manage Orders</Link>
           </div>
@@ -138,7 +140,7 @@ const Nav = ({ user }: { user: IUser }) => {
         {user.role == "admin" && 
         <>
           <div className="hidden md:flex items-center gap-4">
-            <Link href={""} className="flex items-center gap-2 bg-white text-green-700 font-semibold px-4 py-2 rounded-full hover:bg-green-100 transition-all"><Plus className='w-5 h-5'/> Add Grocery</Link>
+            <Link href={"/admin/add-grocery"} className="flex items-center gap-2 bg-white text-green-700 font-semibold px-4 py-2 rounded-full hover:bg-green-100 transition-all"><Plus className='w-5 h-5'/> Add Grocery</Link>
             <Link href={""} className="flex items-center gap-2 bg-white text-green-700 font-semibold px-4 py-2 rounded-full hover:bg-green-100 transition-all"><Boxes className='w-5 h-5'/> View Grocery</Link>
             <Link href={""} className="flex items-center gap-2 bg-white text-green-700 font-semibold px-4 py-2 rounded-full hover:bg-green-100 transition-all"><ClipboardCheck className='w-5 h-5'/> Manage Orders</Link>
           </div>
