@@ -7,3 +7,7 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
+
+html {
+  font-size: clamp(14px, 0.9vw, 16px);
+}
