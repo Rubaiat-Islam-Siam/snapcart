@@ -8,6 +8,9 @@ import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { signOut } from "next-auth/react";
 import { createPortal } from "react-dom";
+import { useSelector } from "react-redux";
+import { RootState } from "../redux/store";
+
 
 interface IUser {
   _id: mongoose.Types.ObjectId;
@@ -25,6 +28,7 @@ const Nav = ({ user }: { user: IUser }) => {
   const [menuOpen,setMenuOpen] = useState(false)
   const [loading,setLoading] = useState(false)
   const profileDropDown = useRef<HTMLDivElement>(null);
+  const {cartData} = useSelector((state:RootState)=>state.cart)
   
 
   useEffect(() => {
@@ -131,7 +135,7 @@ const Nav = ({ user }: { user: IUser }) => {
         >
           <ShoppingCart className="text-green-600 w-6 h-6" />
           <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full font-semibold shadow">
-            0
+            {cartData.length}
           </span>
         </Link>          
           </>
