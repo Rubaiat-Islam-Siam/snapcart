@@ -14,11 +14,17 @@ interface IGrocery {
 }
 
 interface ICartSlice {
-    cartData: IGrocery[]
+    cartData: IGrocery[],
+    subTotal: number,
+    deliveryFee: number,
+    finalTotal: number,
 }
 
 const initialState:ICartSlice = {
-    cartData: []
+    cartData: [],
+    subTotal: 0,
+    deliveryFee: 60,
+    finalTotal: 60,
 }
 
 const cartSlice = createSlice({
@@ -27,12 +33,14 @@ const cartSlice = createSlice({
     reducers:{
         addToCart: (state,action:PayloadAction<IGrocery>) => {
             state.cartData.push(action.payload)
+            cartSlice.caseReducers.calculateTotal(state)
         },
         increaseQuantity: (state,action:PayloadAction<mongoose.Types.ObjectId>) => {
             const item = state.cartData.find(item => item._id === action.payload)
             if(item){
                 item.quantity++
             }
+            cartSlice.caseReducers.calculateTotal(state)
         },
         decreaseQuantity: (state,action:PayloadAction<mongoose.Types.ObjectId>) => {
             const item = state.cartData.find(item => item._id === action.payload)
@@ -42,9 +50,19 @@ const cartSlice = createSlice({
             else{
                 state.cartData = state.cartData.filter(item => item._id !== action.payload)
             }
+            cartSlice.caseReducers.calculateTotal(state)
+        },
+        removeFromCart: (state,action:PayloadAction<mongoose.Types.ObjectId>) => {
+            state.cartData = state.cartData.filter(item => item._id !== action.payload)
+            cartSlice.caseReducers.calculateTotal(state)
+        },
+        calculateTotal: (state) => {
+            state.subTotal = state.cartData.reduce((total,item)=>total+Number(item.price)*item.quantity,0)
+            state.deliveryFee = state.subTotal > 500 ? 0 : 60
+            state.finalTotal = state.subTotal + state.deliveryFee
         }
     }
 })
 
-export const {addToCart,increaseQuantity,decreaseQuantity} = cartSlice.actions
+export const {addToCart,increaseQuantity,decreaseQuantity,removeFromCart} = cartSlice.actions
 export default cartSlice.reducer
