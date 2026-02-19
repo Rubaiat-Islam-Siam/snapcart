@@ -1,6 +1,7 @@
 "use client"
 import { ArrowLeft, Building, CreditCardIcon, Home, Loader2, LocateFixed, MapPin, Navigation, Phone, Search, Truck, User, Wallet } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { motion } from "motion/react"
 import { useSelector } from "react-redux"
 import { RootState } from "@/src/redux/store"
@@ -13,6 +14,7 @@ import { OpenStreetMapProvider } from "leaflet-geosearch"
 
 
 function checkout() {
+    const router = useRouter()
     const markerIcon = new L.Icon({
         iconUrl: "https://cdn-icons-png.flaticon.com/128/684/684908.png",
         iconSize: [40, 40],
@@ -21,9 +23,9 @@ function checkout() {
     })
     const [searchQuery, setSearchQuery] = useState("")
     const { userData } = useSelector((state: RootState) => state.user)
-    const { subTotal,deliveryFee,finalTotal } = useSelector((state: RootState) => state.cart)
+    const { subTotal, deliveryFee, finalTotal, cartData } = useSelector((state: RootState) => state.cart)
     const [loading, setLoading] = useState(false)
-    const [paymentMethod,setPaymentMethod] = useState<"cod" | "online">("cod")
+    const [paymentMethod, setPaymentMethod] = useState<"cod" | "online">("cod")
     const [address, setAddress] = useState({
         fullname: "",
         mobile: "",
@@ -61,11 +63,11 @@ function checkout() {
         }
     }, [userData])
 
-    const DraggableMarker:React.FC = () => {
+    const DraggableMarker: React.FC = () => {
         const map = useMap()
         useEffect(() => {
-            if(position){
-                map.setView(position as LatLngExpression, 15,{animate:true})
+            if (position) {
+                map.setView(position as LatLngExpression, 15, { animate: true })
             }
         }, [position])
         return (
@@ -86,23 +88,57 @@ function checkout() {
     const handleSearch = async () => {
         setLoading(true)
         const provider = new OpenStreetMapProvider()
-        const results = await provider.search({query: searchQuery})
-        if(results){
+        const results = await provider.search({ query: searchQuery })
+        if (results) {
             setPosition([results[0].y, results[0].x])
         }
         setLoading(false)
     }
-    
+
+    const handleCod = async () => {
+        setLoading(true)
+        try {
+            const result = await axios.post("/api/user/order", {
+                userId: userData?._id,
+                items: cartData.map(item => ({
+                    grocery: item._id,
+                    name: item.name,
+                    price: item.price,
+                    unit: item.unit,
+                    image: item.image,
+                    quantity: item.quantity
+                })),
+                paymentMethod,
+                totalAmount: finalTotal,
+                address: {
+                    fullName: address.fullname,
+                    mobile: address.mobile,
+                    city: address.city,
+                    state: address.state,
+                    pincode: address.pincode,
+                    fullAddress: address.fullAddress,
+                    longitude: position?.[1],
+                    latitude: position?.[0]
+                }
+            })
+            console.log(result.data)
+            router.push("/user/order-success")
+        } catch (error) {
+            console.log(error)
+        }
+        setLoading(false)
+    }
+
     const handleCurrentLocation = () => {
-        if(navigator.geolocation){
-            navigator.geolocation.getCurrentPosition((position)=> {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((position) => {
                 setPosition([position.coords.latitude, position.coords.longitude])
             })
         }
     }
-    useEffect(()=> {
-        const fetchAddress = async ()=> {
-            if(!position) return
+    useEffect(() => {
+        const fetchAddress = async () => {
+            if (!position) return
             try {
                 const result = await axios.get(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${position[0]}&lon=${position[1]}`)
                 console.log(result.data)
@@ -183,14 +219,14 @@ function checkout() {
                                         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                                     />
-                                    <DraggableMarker/>
+                                    <DraggableMarker />
                                 </MapContainer>
                             }
                             <motion.button
-                            whileTap={{scale:0.95}}
-                            className="absolute bottom-4 right-4 bg-green-600 text-white p-3 rounded-full hover:bg-green-700 transition-all flex items-center justify-center z-999" onClick={handleCurrentLocation}
+                                whileTap={{ scale: 0.95 }}
+                                className="absolute bottom-4 right-4 bg-green-600 text-white p-3 rounded-full hover:bg-green-700 transition-all flex items-center justify-center z-999" onClick={handleCurrentLocation}
                             >
-                                <LocateFixed className="w-12 h-12 text-white"/>
+                                <LocateFixed className="w-12 h-12 text-white" />
                             </motion.button>
 
                         </div>
@@ -198,15 +234,15 @@ function checkout() {
 
                 </motion.div>
                 <motion.div
-                animate={{opacity:1, y:0}}
-                initial={{opacity:0, y:20}}
-                transition={{duration:0.5}}
-                className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 border border-gray-100 h-fit"
+                    animate={{ opacity: 1, y: 0 }}
+                    initial={{ opacity: 0, y: 20 }}
+                    transition={{ duration: 0.5 }}
+                    className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 border border-gray-100 h-fit"
                 >
                     <h2 className="text-xl font-semibold text-gray-800 mb-6 flex items-center gap-2"><Wallet className="text-green-600" /> Payment Method</h2>
                     <div className="space-y-4 mb-6">
-                        <button onClick={() => setPaymentMethod("online")} className={`flex items-center gap-2 p-3 rounded-lg border w-full transition-all ${paymentMethod === "online" ? "border-green-500 bg-green-50 shadow-sm" : "hover:bg-gray-200"}`}><CreditCardIcon/><span>Pay Online (stripe)</span></button>
-                        <button onClick={() => setPaymentMethod("cod")} className={`flex items-center gap-2 p-3 rounded-lg border w-full transition-all ${paymentMethod === "cod" ? "border-green-500 bg-green-50 shadow-sm" : "hover:bg-gray-200"}`}><Truck/><span>Cash on Delivery</span></button>
+                        <button onClick={() => setPaymentMethod("online")} className={`flex items-center gap-2 p-3 rounded-lg border w-full transition-all ${paymentMethod === "online" ? "border-green-500 bg-green-50 shadow-sm" : "hover:bg-gray-200"}`}><CreditCardIcon /><span>Pay Online (stripe)</span></button>
+                        <button onClick={() => setPaymentMethod("cod")} className={`flex items-center gap-2 p-3 rounded-lg border w-full transition-all ${paymentMethod === "cod" ? "border-green-500 bg-green-50 shadow-sm" : "hover:bg-gray-200"}`}><Truck /><span>Cash on Delivery</span></button>
                     </div>
 
                     <div className="border-t pt-4 text-gray-700 space-y-2 text-sm sm:text-base">
@@ -224,10 +260,14 @@ function checkout() {
                         </div>
                     </div>
                     <motion.button
-                    whileTap={{scale:0.95}}
-                    className="w-full bg-green-600 text-white py-3 rounded-full hover:bg-green-700 transition-all font-semibold mt-6"
+                        whileTap={{ scale: 0.95 }}
+                        className="w-full bg-green-600 text-white py-3 rounded-full hover:bg-green-700 transition-all font-semibold mt-6" onClick={() => {
+                            if (paymentMethod == "cod") {
+                                handleCod()
+                            } else null
+                        }}
                     >
-                        {paymentMethod=="cod"?"Place Order":"Pay Now"}
+                        {paymentMethod == "cod" ? "Place Order" : "Pay Now"}
                     </motion.button>
 
                 </motion.div>
