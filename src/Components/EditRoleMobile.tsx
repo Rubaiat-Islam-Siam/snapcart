@@ -5,12 +5,16 @@ import { Bike, User, UserCog, ArrowRight } from 'lucide-react'
 import axios from 'axios'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
+import { useDispatch } from 'react-redux'
+import { AppDispatch } from '../redux/store'
+import { setUserData } from '../redux/userSlice'
 
 const EditRoleMobile = () => {
   const [selectedRole, setSelectedRole] = useState("")
   const [mobile, setMobile] = useState("")
   const router = useRouter()
-  const {update} = useSession()
+  const { update } = useSession()
+  const dispatch = useDispatch<AppDispatch>()
 
   const roles = [
     { id: "admin", label: "Admin", icon: UserCog },
@@ -23,14 +27,17 @@ const EditRoleMobile = () => {
 
   const handleEdit = async () => {
     try {
-        const result = await axios.post("/api/user/edit-role-mobile",{
-            role:selectedRole,
-            mobile
-        })
-        await update({role:selectedRole})
-        router.push("/")
+      const result = await axios.post("/api/user/edit-role-mobile", {
+        role: selectedRole,
+        mobile
+      })
+      await update({ role: selectedRole })
+      // Re-fetch user data to update Redux store with new mobile
+      const res = await axios.get("/api/me")
+      dispatch(setUserData(res.data.user))
+      router.push("/")
     } catch (error) {
-        console.log(error)
+      console.log(error)
     }
   }
 
@@ -59,11 +66,10 @@ const EditRoleMobile = () => {
               onClick={() => setSelectedRole(role.id)}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className={`cursor-pointer flex flex-col items-center justify-center w-48 h-44 rounded-2xl border-2 transition-all ${
-                isSelected
-                  ? "border-green-600 bg-green-100 shadow-lg"
-                  : "border-gray-300 bg-white hover:border-green-400"
-              }`}
+              className={`cursor-pointer flex flex-col items-center justify-center w-48 h-44 rounded-2xl border-2 transition-all ${isSelected
+                ? "border-green-600 bg-green-100 shadow-lg"
+                : "border-gray-300 bg-white hover:border-green-400"
+                }`}
             >
               <motion.div
                 animate={{ scale: isSelected ? 1.2 : 1 }}
@@ -100,7 +106,7 @@ const EditRoleMobile = () => {
           }
           className="w-64 md:w-80 px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-green-500 focus:outline-none"
           placeholder="eg. 01*********"
-          
+
         />
       </motion.div>
 
@@ -110,11 +116,10 @@ const EditRoleMobile = () => {
         whileHover={isValid ? { scale: 1.05 } : {}}
         disabled={!isValid}
         onClick={handleEdit}
-        className={`mt-10 mx-auto flex items-center gap-2 px-8 py-3 rounded-xl font-semibold transition-all ${
-          isValid
-            ? "bg-green-600 text-white hover:bg-green-700 cursor-pointer"
-            : "bg-gray-400 text-gray-200 cursor-not-allowed"
-        }`}
+        className={`mt-10 mx-auto flex items-center gap-2 px-8 py-3 rounded-xl font-semibold transition-all ${isValid
+          ? "bg-green-600 text-white hover:bg-green-700 cursor-pointer"
+          : "bg-gray-400 text-gray-200 cursor-not-allowed"
+          }`}
       >
         Go to Home
         <ArrowRight size={20} />
