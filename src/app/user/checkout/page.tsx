@@ -116,13 +116,46 @@ function checkout() {
                     city: address.city,
                     state: address.state,
                     pincode: address.pincode,
-                    fullAddress: address.fullAddress,
+                    fulladdress: address.fullAddress,
                     longitude: position?.[1],
                     latitude: position?.[0]
                 }
             })
             console.log(result.data)
             router.push("/user/order-success")
+        } catch (error) {
+            console.log(error)
+        }
+        setLoading(false)
+    }
+
+    const handlePayment = async () => {
+        setLoading(true)
+        try {
+            const result = await axios.post("/api/user/payment", {
+                userId: userData?._id,
+                items: cartData.map(item => ({
+                    grocery: item._id,
+                    name: item.name,
+                    price: item.price,
+                    unit: item.unit,
+                    image: item.image,
+                    quantity: item.quantity
+                })),
+                paymentMethod,
+                totalAmount: finalTotal,
+                address: {
+                    fullName: address.fullname,
+                    mobile: address.mobile,
+                    city: address.city,
+                    state: address.state,
+                    pincode: address.pincode,
+                    fulladdress: address.fullAddress,
+                    longitude: position?.[1],
+                    latitude: position?.[0]
+                }
+            })
+            window.location.href = result.data.url
         } catch (error) {
             console.log(error)
         }
@@ -264,7 +297,9 @@ function checkout() {
                         className="w-full bg-green-600 text-white py-3 rounded-full hover:bg-green-700 transition-all font-semibold mt-6" onClick={() => {
                             if (paymentMethod == "cod") {
                                 handleCod()
-                            } else null
+                            } else {
+                                handlePayment()
+                            }
                         }}
                     >
                         {paymentMethod == "cod" ? "Place Order" : "Pay Now"}

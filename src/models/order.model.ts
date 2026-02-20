@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
 
-interface IOder {
+export interface IOder {
     _id: mongoose.Types.ObjectId
-    user: mongoose.Types.ObjectId
+    user: mongoose.Types.ObjectId | { _id: mongoose.Types.ObjectId; name: string }
     items: [{
         grocery: mongoose.Types.ObjectId
         name: string
@@ -11,6 +11,7 @@ interface IOder {
         image: string
         quantity: number
     }]
+    isPaid: boolean
     totalAmount: number
     paymentMethod: "cod" | "online"
     address: {
@@ -59,6 +60,10 @@ const orderSchema = new mongoose.Schema<IOder>({
     totalAmount: {
         type: Number,
 
+    },
+    isPaid: {
+        type: Boolean,
+        default: false
     },
     paymentMethod: {
         type: String,
