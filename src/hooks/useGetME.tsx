@@ -20,7 +20,7 @@ function useGetME() {
             }
         }
         getMe()
-    }, [])
+    }, [dispatch])
 }
 
 export default useGetME

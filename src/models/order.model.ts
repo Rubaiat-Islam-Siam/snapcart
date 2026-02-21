@@ -24,6 +24,8 @@ export interface IOder {
         longitude: number
         latitude: number
     }
+    assignment?: mongoose.Types.ObjectId 
+    assignedDeliveryBoy?: mongoose.Types.ObjectId 
     status: "pending" | "out of delivery" | "delivered" | "cancelled"
     createdAt?: Date
     updatedAt?: Date
@@ -100,6 +102,15 @@ const orderSchema = new mongoose.Schema<IOder>({
         type: String,
         enum: ["pending", "out of delivery", "delivered", "cancelled"],
         default: "pending"
+    },
+    assignment: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "DeliveryAssignment",
+        default: null
+    },
+    assignedDeliveryBoy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "user",
     },
     createdAt: {
         type: Date,
