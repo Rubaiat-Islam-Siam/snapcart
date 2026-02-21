@@ -7,6 +7,7 @@ import Nav from "../Components/Nav";
 import UserDashboard from "../Components/UserDashboard";
 import AdminDashboard from "../Components/AdminDashboard";
 import DeliveryDashboad from "../Components/DeliveryDashboad";
+import GeoUpdater from "../Components/GeoUpdater";
 
 
 export default async function Home() {
@@ -26,6 +27,7 @@ export default async function Home() {
   return (
     <div>
        <Nav user={plainUser}/>
+       <GeoUpdater userId={plainUser._id}/>
        {user.role == "user"?(
         <UserDashboard/>
        ):

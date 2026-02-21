@@ -4,16 +4,8 @@ import { AnimatePresence } from 'motion/react'
 import React, { useEffect, useState } from 'react'
 import {motion} from 'motion/react'
 import Image from 'next/image'
-import { getSocket } from '../lib/socket'
-import { useSelector } from 'react-redux'
-import { RootState } from '../redux/store'
 
 const HeroSection = () => {
-  const {userData} = useSelector((state:RootState)=> state.user)
-  useEffect(()=>{
-    const socket = getSocket()
-    socket.emit("identity",userData?._id)
-  },[userData])
 
     const slides = [
   {
