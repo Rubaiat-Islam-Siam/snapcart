@@ -8,6 +8,7 @@ import UserDashboard from "../Components/UserDashboard";
 import AdminDashboard from "../Components/AdminDashboard";
 import DeliveryDashboad from "../Components/DeliveryDashboad";
 import GeoUpdater from "../Components/GeoUpdater";
+import Delivery from "../Components/Delivery";
 
 
 export default async function Home() {
@@ -33,7 +34,7 @@ export default async function Home() {
        ):
         user.role=="admin"?(
           <AdminDashboard/>
-        ) : <DeliveryDashboad/>
+        ) : <Delivery/>
        }
     </div>
   );

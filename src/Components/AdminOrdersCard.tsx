@@ -42,8 +42,7 @@ function AdminOrdersCard({ order }: { order: IOder }) {
     const handleStatusChange = async (newStatus: string) => {
         setUpdating(true)
         try {
-            await axios.put("/api/admin/update-order", {
-                orderId: order._id,
+            await axios.post(`/api/admin/update-order-status/${order._id}`, {
                 status: newStatus
             })
             setCurrentStatus(newStatus as typeof currentStatus)
@@ -56,8 +55,7 @@ function AdminOrdersCard({ order }: { order: IOder }) {
     const handlePaidChange = async (paid: boolean) => {
         setUpdatingPaid(true)
         try {
-            await axios.put("/api/admin/update-order", {
-                orderId: order._id,
+            await axios.post(`/api/admin/update-order-status/${order._id}`, {
                 isPaid: paid
             })
             setIsPaid(paid)

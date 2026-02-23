@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { motion } from 'motion/react'
 import { Bike, User, UserCog, ArrowRight } from 'lucide-react'
 import axios from 'axios'
@@ -16,11 +16,11 @@ const EditRoleMobile = () => {
   const { update } = useSession()
   const dispatch = useDispatch<AppDispatch>()
 
-  const roles = [
+  const [roles,setRoles] =  useState([
     { id: "admin", label: "Admin", icon: UserCog },
     { id: "user", label: "User", icon: User },
     { id: "deliveryBoy", label: "Delivery Boy", icon: Bike },
-  ]
+  ])
 
   // ✅ validation
   const isValid = selectedRole !== "" && mobile.length === 11
@@ -40,6 +40,20 @@ const EditRoleMobile = () => {
       console.log(error)
     }
   }
+
+  useEffect(() => {
+    const checkAdmin = async () => {
+      try {
+        const result = await axios.get("/api/auth/check-admin")
+        if(result.data.adminExist){
+          setRoles(prev => prev.filter((role) => role.id !== "admin"))
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    checkAdmin()
+  }, [])
 
   return (
     <div className="flex flex-col min-h-screen p-6 w-full">
