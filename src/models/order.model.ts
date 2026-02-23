@@ -24,8 +24,8 @@ export interface IOder {
         longitude: number
         latitude: number
     }
-    assignment?: mongoose.Types.ObjectId 
-    assignedDeliveryBoy?: mongoose.Types.ObjectId 
+    assignment?: mongoose.Types.ObjectId
+    assignedDeliveryBoy?: mongoose.Types.ObjectId
     status: "pending" | "out of delivery" | "delivered" | "cancelled"
     createdAt?: Date
     updatedAt?: Date
@@ -110,7 +110,7 @@ const orderSchema = new mongoose.Schema<IOder>({
     },
     assignedDeliveryBoy: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "user",
+        ref: "User",
     },
     createdAt: {
         type: Date,

@@ -5,8 +5,8 @@ export interface IDeliveryAssignment {
     order: mongoose.Types.ObjectId;
     broadcastedTo: mongoose.Types.ObjectId[];
     assignedTo: mongoose.Types.ObjectId | null;
-    status: "broadcasted" | "assigned" | "completed" ;
-    acceptedAt:Date
+    status: "broadcasted" | "assigned" | "completed";
+    acceptedAt: Date
     createdAt?: Date;
     updatedAt?: Date;
 }
@@ -34,5 +34,5 @@ const deliveryAssignmentSchema = new mongoose.Schema<IDeliveryAssignment>({
     }
 }, { timestamps: true });
 
-const DeliveryAssignment= mongoose.models.DeliveryAssignment || mongoose.model("DeliveryAssignment", deliveryAssignmentSchema);
+const DeliveryAssignment = mongoose.models.DeliveryAssignment || mongoose.model("DeliveryAssignment", deliveryAssignmentSchema);
 export default DeliveryAssignment
