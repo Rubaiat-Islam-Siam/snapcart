@@ -27,6 +27,15 @@ const DeliveryDashboad = () => {
       socket.off("new-assignment")
     }
   },[])
+
+  const handleAccept = async (id:string)=>{
+    try {
+      const res = await axios.get(`/api/delivery/assignment/${id}/accept-assignment`)
+      console.log(res.data)
+    } catch (error) {
+      console.log(error)
+    }
+  }
   return (
     <div className='w-full min-h-screen bg-gray-50 p-4'>
       <div className='max-w-3xl mx-auto'>
@@ -37,7 +46,7 @@ const DeliveryDashboad = () => {
             <p className='text-gray-600'>{a.order?.address?.fulladdress}</p>
 
             <div className='flex gap-3 mt-4'>
-              <button className='bg-green-600 text-white py-2 rounded-lg flex-1'>Accept</button>
+              <button className='bg-green-600 text-white py-2 rounded-lg flex-1' onClick={()=>handleAccept(a._id)}>Accept</button>
               <button className='bg-red-600 text-white py-2 rounded-lg flex-1'>Reject</button>
             </div>
           </div>
