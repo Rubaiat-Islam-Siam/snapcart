@@ -2,10 +2,12 @@
 import { ChevronDown, ChevronUp, CreditCard, MapPin, Package, Truck } from "lucide-react"
 import { IOder } from "../models/order.model"
 import { motion } from "framer-motion"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { getSocket } from "../lib/socket"
 
 function UserOderCard({ order }: { order: IOder }) {
     const [expanded, setExpanded] = useState(false)
+    const [status, setStatus] = useState(order.status)
 
     const getStatusColor = (status: string) => {
         switch (status) {
@@ -19,6 +21,21 @@ function UserOderCard({ order }: { order: IOder }) {
                 return "bg-red-50 text-red-700 border-red-200"
         }
     }
+
+    useEffect((): any => {
+        const socket = getSocket()
+        socket.on("order-status-update", (data: {
+            orderId: string,
+            status: "pending" | "out of delivery" | "delivered" | "cancelled"
+        }) => {
+            if (data.orderId == order._id.toString()) {
+                setStatus(data.status)
+            }
+        })
+        return () => {
+            socket.off("order-status-update")
+        }
+    }, [])
 
     return (
         <motion.div
@@ -52,8 +69,8 @@ function UserOderCard({ order }: { order: IOder }) {
                         {order.isPaid ? "Paid" : "Unpaid"}
                     </span>
 
-                    <span className={`px-3 py-1 text-xs font-semibold rounded-full border capitalize ${getStatusColor(order.status)}`}>
-                        {order.status}
+                    <span className={`px-3 py-1 text-xs font-semibold rounded-full border capitalize ${getStatusColor(status)}`}>
+                        {status}
                     </span>
                 </div>
             </div>

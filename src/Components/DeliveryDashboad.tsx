@@ -1,6 +1,7 @@
 "use client"
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
+import { getSocket } from '../lib/socket'
 
 const DeliveryDashboad = () => {
   const [assignments, setAssignments] = useState<any[]>([])
@@ -16,6 +17,16 @@ const DeliveryDashboad = () => {
 
     fetchAssignments();
   }, []);
+
+  useEffect(()=>{
+    const socket = getSocket()
+    socket.on("new-assignment",(data)=>{
+      setAssignments((prev:any)=>[...prev,data])
+    })
+    return ()=>{
+      socket.off("new-assignment")
+    }
+  },[])
   return (
     <div className='w-full min-h-screen bg-gray-50 p-4'>
       <div className='max-w-3xl mx-auto'>

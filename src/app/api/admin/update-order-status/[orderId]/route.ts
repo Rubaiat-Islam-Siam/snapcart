@@ -3,6 +3,7 @@ import DeliveryAssignment from "@/src/models/deliveryAssignment.model";
 import Order from "@/src/models/order.model";
 import User from "@/src/models/user.model";
 import { NextRequest, NextResponse } from "next/server";
+import emitEventHandler from "../../../../../lib/emitEventHandler";
 
 export async function POST(req: NextRequest, { params }: {
     params: { orderId: string }
@@ -42,7 +43,12 @@ export async function POST(req: NextRequest, { params }: {
             const candidates = availableDeliveryBoy.map((b) => b._id)
 
             if (candidates.length == 0) {
+
                 await order.save()
+                await emitEventHandler("order-status-update", {
+                    orderId: order._id,
+                    status: order.status,
+                })
                 return NextResponse.json({ message: "No avaliable delivery boy" }, { status: 200 })
             }
 
@@ -51,6 +57,14 @@ export async function POST(req: NextRequest, { params }: {
                 broadcastedTo: candidates,
                 status: "broadcasted"
             })
+
+            await deliveryAssignment.populate("order")
+            for(const boyId of candidates){
+                const boy = await User.findById(boyId)
+                if(boy?.socketId){
+                    await emitEventHandler("new-assignment",deliveryAssignment,boy.socketId)
+                }
+            }
 
             order.assignment = deliveryAssignment._id
             deliveryBoyPayload = availableDeliveryBoy.map((b) => ({
@@ -65,6 +79,11 @@ export async function POST(req: NextRequest, { params }: {
         }
         order.status = status
         await order.save()
+        await order.populate("user")
+        await emitEventHandler("order-status-update", {
+            orderId: order._id,
+            status: order.status,
+        }, order.user.socketId)
         return NextResponse.json({
             success: true,
             message: "Order updated successfully",
