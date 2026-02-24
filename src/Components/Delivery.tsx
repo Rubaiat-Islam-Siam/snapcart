@@ -2,9 +2,9 @@ import DeliveryDashboad from "./DeliveryDashboad"
 
 function Delivery() {
     return (
-        <>
+        
         <DeliveryDashboad/>
-        </>
+        
     )
 }
 

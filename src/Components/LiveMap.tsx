@@ -13,11 +13,11 @@ interface IProps {
     deliveryBoyLocation: ILocation | null
 }
 
-function Recenter({ positions }: { positions: [number, number][] }) {
+function Recenter({ position }: { position: [number, number] }) {
     const map = useMap()
     useEffect(() => {
-        if (positions[0][0] !== 0 && positions[0][1] !== 0) {
-            map.setView(positions[0], map.getZoom(), {
+        if (position[0] !== 0 && position[1] !== 0) {
+            map.setView(position, map.getZoom(), {
                 animate: true,
             })
         }
@@ -52,7 +52,7 @@ function LiveMap({ userLocation, deliveryBoyLocation }: IProps) {
     return (
         <div className="w-full h-[500px] rounded-xl overflow-hidden shadow relative">
             <MapContainer center={center as LatLngExpression} className="w-full h-full" zoom={13} scrollWheelZoom={true}>
-                <Recenter positions={center as any} />
+                <Recenter position={center as [number, number]} />
                 <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

@@ -6,9 +6,9 @@ import { getSocket } from "../lib/socket"
 import { useSelector } from "react-redux"
 import { RootState } from "../redux/store"
 import dynamic from "next/dynamic"
+import { motion } from "framer-motion"
 
 const LiveMap = dynamic(() => import("./LiveMap"), { ssr: false })
-
 
 interface ILocation {
   latitude: number
@@ -24,7 +24,6 @@ const DeliveryDashboad = () => {
   const [deliveryBoyLocation, setDeliveryBoyLocation] = useState<ILocation | null>({ latitude: 0, longitude: 0 })
   const [loading, setLoading] = useState(true)
 
-  /* ================= FETCH ASSIGNMENTS ================= */
   const fetchAssignments = async () => {
     try {
       const res = await axios.get("/api/delivery/get-assignments")
@@ -34,7 +33,6 @@ const DeliveryDashboad = () => {
     }
   }
 
-  /* ================= FETCH CURRENT ACTIVE ORDER ================= */
   const fetchCurrentOrder = async () => {
     try {
       const result = await axios.get("/api/delivery/current-order")
@@ -43,10 +41,12 @@ const DeliveryDashboad = () => {
         const order = result.data.assignment
         setActiveOrder(order)
 
-        setUserLocation({
-          latitude: order.order.address.latitude,
-          longitude: order.order.address.longitude,
-        })
+        if (order?.order?.address?.latitude && order?.order?.address?.longitude) {
+          setUserLocation({
+            latitude: order.order.address.latitude,
+            longitude: order.order.address.longitude,
+          })
+        }
       }
     } catch (error) {
       console.log(error)
@@ -57,6 +57,7 @@ const DeliveryDashboad = () => {
     const socket = getSocket()
     if (!userData?._id) return
     if (!navigator.geolocation) return
+
     const watchId = navigator.geolocation.watchPosition(
       (position) => {
         setDeliveryBoyLocation({
@@ -78,17 +79,15 @@ const DeliveryDashboad = () => {
         maximumAge: 0,
       }
     )
+
     return () => {
       navigator.geolocation.clearWatch(watchId)
     }
   })
 
-  /* ================= ACCEPT ORDER ================= */
   const handleAccept = async (id: string) => {
     try {
       await axios.get(`/api/delivery/assignment/${id}/accept-assignment`)
-
-      // refresh UI
       await fetchCurrentOrder()
       await fetchAssignments()
     } catch (error) {
@@ -96,7 +95,6 @@ const DeliveryDashboad = () => {
     }
   }
 
-  /* ================= REJECT ORDER ================= */
   const handleReject = async (id: string) => {
     try {
       await axios.get(`/api/delivery/assignment/${id}/reject`)
@@ -106,7 +104,6 @@ const DeliveryDashboad = () => {
     }
   }
 
-  /* ================= SOCKET LISTENER ================= */
   useEffect(() => {
     const socket = getSocket()
 
@@ -121,125 +118,132 @@ const DeliveryDashboad = () => {
     }
   }, [])
 
-  /* ================= INITIAL LOAD ================= */
   useEffect(() => {
     const init = async () => {
       await fetchCurrentOrder()
       await fetchAssignments()
       setLoading(false)
     }
-
     init()
   }, [])
 
-  /* ================= LOADING SCREEN ================= */
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-xl font-semibold">
-        Loading Delivery Dashboard...
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-purple-100">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="text-2xl font-bold text-indigo-600"
+        >
+          🚚 Loading Delivery Dashboard...
+        </motion.div>
       </div>
     )
   }
 
-  /* ================= ACTIVE DELIVERY SCREEN ================= */
-  if (activeOrder && userLocation) {
+  if (activeOrder && userLocation && userLocation.latitude !== 0 && userLocation.longitude !== 0) {
     return (
-      <div className="p-4 pt-[120px] min-h-screen bg-gray-50">
-        <div className="max-w-3xl mx-auto">
-
-          <h1 className="text-2xl font-bold text-green-700">
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 pt-[120px] p-6">
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-4xl mx-auto bg-white rounded-3xl shadow-2xl p-8 border border-green-100"
+        >
+          <h1 className="text-3xl font-bold text-emerald-600 mb-2">
             🚚 Active Delivery
           </h1>
 
-          <p className="text-gray-700 mb-6">
+          <p className="text-gray-600 mb-6">
             Order #{activeOrder.order._id.slice(-6)}
           </p>
 
-          <div className="bg-white p-6 rounded-xl shadow-lg border">
-
-            <p className="text-gray-600 mb-2 font-semibold">
-              Delivery Address:
+          <div className="bg-emerald-50 rounded-2xl p-6 mb-6 border border-emerald-100">
+            <p className="text-sm text-gray-500 font-semibold mb-2">
+              Delivery Address
             </p>
-
-            <p className="text-gray-800 mb-4">
+            <p className="text-lg text-gray-800">
               📍 {activeOrder.order.address.fulladdress}
             </p>
-
-            <div className="rounded-xl shadow-lg border overflow-hidden mb-6">
-              <LiveMap
-                userLocation={userLocation}
-                deliveryBoyLocation={deliveryBoyLocation}
-            />
-            </div>
-
           </div>
-        </div>
+
+          <div className="rounded-2xl overflow-hidden shadow-xl border">
+            <LiveMap
+              userLocation={userLocation}
+              deliveryBoyLocation={deliveryBoyLocation}
+            />
+          </div>
+        </motion.div>
       </div>
     )
   }
 
-  /* ================= ASSIGNMENT LIST ================= */
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-100 to-slate-200 p-6">
-      <div className="max-w-4xl mx-auto">
-
-        <h2 className="text-3xl font-bold mt-24 mb-10 text-center text-gray-800">
+      <div className="max-w-5xl mx-auto">
+        <motion.h2
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-4xl font-extrabold mt-24 mb-12 text-center text-gray-800"
+        >
           🚚 Delivery Assignments
-        </h2>
+        </motion.h2>
 
         {assignments.length === 0 && (
-          <div className="text-center text-gray-500">
+          <div className="text-center text-gray-500 text-lg">
             No new assignments available
           </div>
         )}
 
-        <div className="space-y-6">
-          {assignments.map((a) => (
-            <div
+        <div className="grid md:grid-cols-2 gap-8">
+          {assignments.map((a, index) => (
+            <motion.div
               key={a._id}
-              className="bg-white rounded-2xl shadow-md hover:shadow-xl transition p-6 border border-gray-100"
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+              className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 p-6 border border-gray-100"
             >
-              {/* Order Info */}
               <div className="flex justify-between items-start mb-4">
                 <div>
-                  <p className="text-sm text-gray-500">Order ID</p>
-                  <p className="font-semibold text-lg text-gray-800">
+                  <p className="text-xs text-gray-400 uppercase tracking-wider">
+                    Order ID
+                  </p>
+                  <p className="font-bold text-xl text-gray-800">
                     #{a?.order?._id.slice(-6)}
                   </p>
                 </div>
 
-                <span className="px-3 py-1 text-xs bg-blue-100 text-blue-600 rounded-full">
+                <span className="px-4 py-1 text-xs bg-indigo-100 text-indigo-600 rounded-full font-semibold">
                   New Assignment
                 </span>
               </div>
 
-              {/* Address */}
-              <div className="bg-gray-50 rounded-lg p-4 text-gray-700 text-sm mb-5">
+              <div className="bg-gray-50 rounded-xl p-4 text-gray-700 text-sm mb-6 border">
                 📍 {a.order?.address?.fulladdress}
               </div>
 
-              {/* Buttons */}
               <div className="flex gap-4">
-
-                <button
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  whileHover={{ scale: 1.03 }}
                   onClick={() => handleAccept(a._id)}
-                  className="flex-1 py-3 rounded-xl bg-green-600 hover:bg-green-700 text-white font-semibold transition"
+                  className="flex-1 py-3 rounded-2xl bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold shadow-lg"
                 >
                   Accept
-                </button>
+                </motion.button>
 
-                <button
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  whileHover={{ scale: 1.03 }}
                   onClick={() => handleReject(a._id)}
-                  className="flex-1 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-semibold transition"
+                  className="flex-1 py-3 rounded-2xl bg-gradient-to-r from-red-500 to-pink-600 text-white font-semibold shadow-lg"
                 >
                   Reject
-                </button>
-
+                </motion.button>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
-
       </div>
     </div>
   )
