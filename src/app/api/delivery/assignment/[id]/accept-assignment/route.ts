@@ -4,7 +4,7 @@ import DeliveryAssignment from "@/src/models/deliveryAssignment.model"
 import Order from "@/src/models/order.model"
 import { NextRequest, NextResponse } from "next/server"
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
         await connectDb()
         const { id } = await params

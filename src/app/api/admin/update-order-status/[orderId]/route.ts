@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 import emitEventHandler from "../../../../../lib/emitEventHandler";
 
 export async function POST(req: NextRequest, { params }: {
-    params: { orderId: string }
+    params: Promise<{ orderId: string }>
 }) {
     try {
         await connectDb()
