@@ -5,6 +5,7 @@ import { useEffect, useState } from "react"
 import { getSocket } from "../lib/socket"
 import mongoose from "mongoose"
 import { IUser } from "../models/user.model"
+import { useRouter } from "next/navigation"
 
 interface IOder {
     _id: mongoose.Types.ObjectId
@@ -40,6 +41,7 @@ interface IOder {
 function UserOderCard({ order }: { order: IOder }) {
     const [expanded, setExpanded] = useState(false)
     const [status, setStatus] = useState(order.status)
+    const route = useRouter()
 
     const getStatusColor = (status: string) => {
         switch (status) {
@@ -139,7 +141,7 @@ function UserOderCard({ order }: { order: IOder }) {
                         <a href={`tel:${order.assignedDeliveryBoy.mobile}` } className="bg-blue-600 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-blue-700 transition">Call</a>
                     </div>
                 
-                <button className="w-full items-center justify-center flex gap-2 bg-green-600 text-white font-semibold hover:bg-green-700 rounded-xl shadow transition py-3"><Truck/>Track Your Order</button>
+                <button className="w-full items-center justify-center flex gap-2 bg-green-600 text-white font-semibold hover:bg-green-700 rounded-xl shadow transition py-3" onClick={()=> route.push(`/user/track-order/${order._id?.toString()}`)}><Truck/>Track Your Order</button>
                 </>
                 }
 

@@ -5,13 +5,23 @@ import React, { useEffect, useState } from "react"
 import { getSocket } from "../lib/socket"
 import { useSelector } from "react-redux"
 import { RootState } from "../redux/store"
+import dynamic from "next/dynamic"
+
+const LiveMap = dynamic(() => import("./LiveMap"), { ssr: false })
+
+
+interface ILocation {
+  latitude: number
+  longitude: number
+}
 
 const DeliveryDashboad = () => {
   const { userData } = useSelector((state: RootState) => state.user)
 
   const [assignments, setAssignments] = useState<any[]>([])
   const [activeOrder, setActiveOrder] = useState<any>(null)
-  const [userLocation, setUserLocation] = useState<any>(null)
+  const [userLocation, setUserLocation] = useState<ILocation | null>({ latitude: 0, longitude: 0 })
+  const [deliveryBoyLocation, setDeliveryBoyLocation] = useState<ILocation | null>({ latitude: 0, longitude: 0 })
   const [loading, setLoading] = useState(true)
 
   /* ================= FETCH ASSIGNMENTS ================= */
@@ -42,6 +52,36 @@ const DeliveryDashboad = () => {
       console.log(error)
     }
   }
+
+  useEffect(() => {
+    const socket = getSocket()
+    if (!userData?._id) return
+    if (!navigator.geolocation) return
+    const watchId = navigator.geolocation.watchPosition(
+      (position) => {
+        setDeliveryBoyLocation({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        })
+        socket.emit("delivery-location", {
+          userId: userData._id,
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        })
+      },
+      (err) => {
+        console.log(err)
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 5000,
+        maximumAge: 0,
+      }
+    )
+    return () => {
+      navigator.geolocation.clearWatch(watchId)
+    }
+  })
 
   /* ================= ACCEPT ORDER ================= */
   const handleAccept = async (id: string) => {
@@ -125,10 +165,11 @@ const DeliveryDashboad = () => {
               📍 {activeOrder.order.address.fulladdress}
             </p>
 
-            <div className="text-sm text-gray-500">
-              Latitude: {userLocation.latitude}
-              <br />
-              Longitude: {userLocation.longitude}
+            <div className="rounded-xl shadow-lg border overflow-hidden mb-6">
+              <LiveMap
+                userLocation={userLocation}
+                deliveryBoyLocation={deliveryBoyLocation}
+            />
             </div>
 
           </div>
