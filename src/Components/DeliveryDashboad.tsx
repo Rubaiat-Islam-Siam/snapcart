@@ -8,6 +8,7 @@ import { RootState } from "../redux/store"
 import dynamic from "next/dynamic"
 import { motion } from "framer-motion"
 import { IOder } from "../models/order.model"
+import DeliveryChat from "./DeliveryChat"
 
 const LiveMap = dynamic(() => import("./LiveMap"), { ssr: false })
 
@@ -179,11 +180,15 @@ const DeliveryDashboad = () => {
             </p>
           </div>
 
-          <div className="rounded-2xl overflow-hidden shadow-xl border">
+          <div className="rounded-2xl overflow-hidden shadow-xl border mb-8">
             <LiveMap
               userLocation={userLocation}
               deliveryBoyLocation={deliveryBoyLocation}
             />
+          </div>
+          
+          <div className="mb-6">
+            <DeliveryChat orderId={activeOrder.order._id} deliveryBoyId={userData?._id!}  />
           </div>
         </motion.div>
       </div>
