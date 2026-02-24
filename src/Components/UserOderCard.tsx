@@ -5,6 +5,7 @@ import { useEffect, useState } from "react"
 import { getSocket } from "../lib/socket"
 import { IOder } from "../models/order.model"
 import { useRouter } from "next/navigation"
+import Image from "next/image"
 
 function UserOderCard({ order }: { order: IOder }) {
     const [expanded, setExpanded] = useState(false)
@@ -24,7 +25,7 @@ function UserOderCard({ order }: { order: IOder }) {
         }
     }
 
-    useEffect((): any => {
+    useEffect(() => {
         const socket = getSocket()
         socket.on("order-status-update", (data: {
             orderId: string,
@@ -59,7 +60,7 @@ function UserOderCard({ order }: { order: IOder }) {
                     </h3>
 
                     <p className="text-gray-500 text-xs sm:text-sm">
-                        {new Date(order.createdAt?.toString()!).toDateString()}
+                        {new Date(order.createdAt || new Date()).toDateString()}
                     </p>
                 </div>
 
@@ -150,7 +151,7 @@ function UserOderCard({ order }: { order: IOder }) {
                                     key={index}
                                     className="flex flex-col sm:flex-row sm:items-center gap-3 p-3 bg-gray-50 rounded-xl"
                                 >
-                                    <img
+                                    <Image
                                         src={item.image}
                                         alt={item.name}
                                         className="w-14 h-14 object-cover rounded-lg border self-start"

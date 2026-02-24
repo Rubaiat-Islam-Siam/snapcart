@@ -9,13 +9,13 @@ import {
   Mail,
   Loader2
 } from "lucide-react"
-import React, { useState } from "react"
+import React, { useState, Suspense } from "react"
 import { motion } from "framer-motion"
 import { useRouter, useSearchParams } from "next/navigation"
 import { signIn, useSession } from "next-auth/react"
 
 
-const LoginPage = () => {
+const LoginForm = () => {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
@@ -177,6 +177,21 @@ const LoginPage = () => {
 
       </form>
     </div>
+  )
+}
+
+const LoginPage = () => {
+  return (
+    <Suspense fallback={
+      <div className="flex flex-col justify-center items-center min-h-screen px-6 py-10 bg-white">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin text-green-600 mx-auto mb-2" />
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   )
 }
 
