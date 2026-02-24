@@ -7,6 +7,7 @@ import { useSelector } from "react-redux"
 import { RootState } from "../redux/store"
 import dynamic from "next/dynamic"
 import { motion } from "framer-motion"
+import { IOder } from "../models/order.model"
 
 const LiveMap = dynamic(() => import("./LiveMap"), { ssr: false })
 
@@ -15,11 +16,23 @@ interface ILocation {
   longitude: number
 }
 
+// Type for populated assignment from API
+interface IPopulatedAssignment {
+  _id: string
+  order: IOder
+  broadcastedTo: string[]
+  assignedTo: string | null
+  status: "broadcasted" | "assigned" | "completed"
+  acceptedAt: Date
+  createdAt?: Date
+  updatedAt?: Date
+}
+
 const DeliveryDashboad = () => {
   const { userData } = useSelector((state: RootState) => state.user)
 
-  const [assignments, setAssignments] = useState<any[]>([])
-  const [activeOrder, setActiveOrder] = useState<any>(null)
+  const [assignments, setAssignments] = useState<IPopulatedAssignment[]>([])
+  const [activeOrder, setActiveOrder] = useState<IPopulatedAssignment | null>(null)
   const [userLocation, setUserLocation] = useState<ILocation | null>({ latitude: 0, longitude: 0 })
   const [deliveryBoyLocation, setDeliveryBoyLocation] = useState<ILocation | null>({ latitude: 0, longitude: 0 })
   const [loading, setLoading] = useState(true)
@@ -107,7 +120,7 @@ const DeliveryDashboad = () => {
   useEffect(() => {
     const socket = getSocket()
 
-    const handler = (data: any) => {
+    const handler = (data: IPopulatedAssignment) => {
       setAssignments(prev => [data, ...prev])
     }
 
@@ -154,7 +167,7 @@ const DeliveryDashboad = () => {
           </h1>
 
           <p className="text-gray-600 mb-6">
-            Order #{activeOrder.order._id.slice(-6)}
+            Order #{activeOrder.order._id.toString().slice(-6)}
           </p>
 
           <div className="bg-emerald-50 rounded-2xl p-6 mb-6 border border-emerald-100">
@@ -209,7 +222,7 @@ const DeliveryDashboad = () => {
                     Order ID
                   </p>
                   <p className="font-bold text-xl text-gray-800">
-                    #{a?.order?._id.slice(-6)}
+                    #{a?.order?._id.toString().slice(-6)}
                   </p>
                 </div>
 

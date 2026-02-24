@@ -6,6 +6,7 @@ import { useState } from "react"
 import axios from "axios"
 import mongoose from "mongoose"
 import { IUser } from "../models/user.model"
+import Image from "next/image"
 
 const statuses = ["pending", "out of delivery", "delivered", "cancelled"] as const
 
@@ -117,7 +118,7 @@ function AdminOrdersCard({ order }: { order: IOder }) {
                         </span>
                     </h3>
                     <p className="text-gray-500 text-xs sm:text-sm">
-                        {new Date(order.createdAt?.toString()!).toLocaleDateString("en-US", {
+                        {new Date(order.createdAt || new Date()).toLocaleDateString("en-US", {
                             weekday: "short", year: "numeric", month: "short", day: "numeric"
                         })}
                     </p>
@@ -218,7 +219,7 @@ function AdminOrdersCard({ order }: { order: IOder }) {
                                             key={index}
                                             className="flex flex-col sm:flex-row sm:items-center gap-3 p-3 bg-gray-50 rounded-xl"
                                         >
-                                            <img
+                                            <Image
                                                 src={item.image}
                                                 alt={item.name}
                                                 className="w-14 h-14 object-cover rounded-lg border self-start"

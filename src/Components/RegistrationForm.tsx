@@ -16,6 +16,7 @@ import { motion } from "framer-motion";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
+import Image from "next/image";
 
 type PropType = {
   prevStep: (s: number) => void;
@@ -186,7 +187,7 @@ const RegistrationForm = ({ prevStep }: PropType) => {
           onClick={()=>signIn("google",{callbackUrl:"/"})}
           className="w-full border border-gray-300 rounded-xl py-3 flex items-center justify-center gap-3 hover:bg-gray-100 transition"
         >
-          <img
+          <Image
             src="https://www.svgrepo.com/show/475656/google-color.svg"
             alt="Google"
             className="w-5 h-5"

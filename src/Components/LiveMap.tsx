@@ -45,7 +45,7 @@ function LiveMap({ userLocation, deliveryBoyLocation }: IProps) {
         iconSize: [40, 40],
     })
     const center = [userLocation.latitude, userLocation.longitude]
-    const linePosition = deliveryBoyLocation && deliveryBoyLocation.latitude !== 0 && deliveryBoyLocation.longitude !== 0 ? [
+    const linePosition: [number, number][] | null = deliveryBoyLocation && deliveryBoyLocation.latitude !== 0 && deliveryBoyLocation.longitude !== 0 ? [
         [deliveryBoyLocation.latitude, deliveryBoyLocation.longitude],
         [userLocation.latitude, userLocation.longitude]
     ] : null
@@ -62,7 +62,7 @@ function LiveMap({ userLocation, deliveryBoyLocation }: IProps) {
                     <Marker position={[deliveryBoyLocation.latitude, deliveryBoyLocation.longitude]} icon={deliveryBoyIcon}><Popup>Delivery Boy Location</Popup></Marker>
                 )}
                 {linePosition && (
-                    <Polyline positions={linePosition as any} color="green" weight={2} opacity={1} />
+                    <Polyline positions={linePosition as unknown as LatLngExpression[]} color="green" weight={2} opacity={1} />
                 )}
             </MapContainer>
         </div>
