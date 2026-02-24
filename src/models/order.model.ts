@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { IUser } from "./user.model";
 
 export interface IOder {
     _id: mongoose.Types.ObjectId
@@ -25,7 +26,7 @@ export interface IOder {
         latitude: number
     }
     assignment?: mongoose.Types.ObjectId
-    assignedDeliveryBoy?: mongoose.Types.ObjectId
+    assignedDeliveryBoy?: mongoose.Types.ObjectId | IUser
     status: "pending" | "out of delivery" | "delivered" | "cancelled"
     createdAt?: Date
     updatedAt?: Date

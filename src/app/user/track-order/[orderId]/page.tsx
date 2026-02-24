@@ -1,48 +1,16 @@
 "use client"
-import { IUser } from "@/src/models/user.model";
 import { RootState } from "@/src/redux/store";
 import axios from "axios";
 import { ArrowLeft } from "lucide-react";
-import mongoose from "mongoose";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import { getSocket } from "@/src/lib/socket";
 import dynamic from "next/dynamic";
+import { IOder } from "@/src/models/order.model";
 
 const LiveMap = dynamic(() => import("@/src/Components/LiveMap"), { ssr: false });
-
-interface IOder {
-    _id: mongoose.Types.ObjectId
-    user: mongoose.Types.ObjectId | { _id: mongoose.Types.ObjectId; name: string }
-    items: [{
-        grocery: mongoose.Types.ObjectId
-        name: string
-        price: string
-        unit: string
-        image: string
-        quantity: number
-    }]
-    isPaid: boolean
-    totalAmount: number
-    paymentMethod: "cod" | "online"
-    address: {
-        fullName: string
-        mobile: string
-        fulladdress: string
-        city: string
-        state: string
-        pincode: string
-        longitude: number
-        latitude: number
-    }
-    assignment?: mongoose.Types.ObjectId
-    assignedDeliveryBoy?: IUser
-    status: "pending" | "out of delivery" | "delivered" | "cancelled"
-    createdAt?: Date
-    updatedAt?: Date
-}
 
 interface ILocation {
     longitude: number

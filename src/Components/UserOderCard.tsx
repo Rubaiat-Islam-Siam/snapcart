@@ -3,40 +3,8 @@ import { ChevronDown, ChevronUp, CreditCard, MapPin, Package, Truck, UserCheck }
 import { motion } from "framer-motion"
 import { useEffect, useState } from "react"
 import { getSocket } from "../lib/socket"
-import mongoose from "mongoose"
-import { IUser } from "../models/user.model"
+import { IOder } from "../models/order.model"
 import { useRouter } from "next/navigation"
-
-interface IOder {
-    _id: mongoose.Types.ObjectId
-    user: mongoose.Types.ObjectId | { _id: mongoose.Types.ObjectId; name: string }
-    items: [{
-        grocery: mongoose.Types.ObjectId
-        name: string
-        price: string
-        unit: string
-        image: string
-        quantity: number
-    }]
-    isPaid: boolean
-    totalAmount: number
-    paymentMethod: "cod" | "online"
-    address: {
-        fullName: string
-        mobile: string
-        fulladdress: string
-        city: string
-        state: string
-        pincode: string
-        longitude: number
-        latitude: number
-    }
-    assignment?: mongoose.Types.ObjectId 
-    assignedDeliveryBoy?: IUser
-    status: "pending" | "out of delivery" | "delivered" | "cancelled"
-    createdAt?: Date
-    updatedAt?: Date
-}
 
 function UserOderCard({ order }: { order: IOder }) {
     const [expanded, setExpanded] = useState(false)
@@ -128,7 +96,7 @@ function UserOderCard({ order }: { order: IOder }) {
                     )
                 }
 
-                {order.assignedDeliveryBoy && <>
+                {order.assignedDeliveryBoy && typeof order.assignedDeliveryBoy === 'object' && 'name' in order.assignedDeliveryBoy && <>
                     <div className="bg-blue-50 mt-4 rounded-xl p-4 border border-blue-200 flex items-center justify-between">
                         <div className="flex items-center gap-3 text-sm text-gray-700">
                             <UserCheck className="text-blue-600" size={18}/>
