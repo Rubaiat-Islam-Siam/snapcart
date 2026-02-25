@@ -40,7 +40,7 @@ const RegistrationForm = ({ prevStep }: PropType) => {
         email,
         password,
       });
-      
+
       // Auto sign-in after successful registration
       const signInResult = await signIn("credentials", {
         email,
@@ -48,7 +48,7 @@ const RegistrationForm = ({ prevStep }: PropType) => {
         redirect: false,
         callbackUrl: "/"
       });
-      
+
       if (signInResult?.ok) {
         router.push("/");
         router.refresh();
@@ -57,8 +57,8 @@ const RegistrationForm = ({ prevStep }: PropType) => {
       }
     } catch (error: unknown) {
       console.log(error);
-      const errorMessage = error instanceof Error ? error.message : 
-        (typeof error === 'object' && error !== null && 'response' in error) 
+      const errorMessage = error instanceof Error ? error.message :
+        (typeof error === 'object' && error !== null && 'response' in error)
           ? ((error as { response?: { data?: { message?: string } } }).response?.data?.message || "Registration failed")
           : "Registration failed";
       setError(errorMessage);
@@ -158,11 +158,10 @@ const RegistrationForm = ({ prevStep }: PropType) => {
         <button
           disabled={!formValidation || loading}
           className={`w-full font-semibold py-3 rounded-xl transition shadow-md flex items-center justify-center gap-2
-    ${
-      formValidation && !loading
-        ? "bg-green-600 hover:bg-green-700 text-white"
-        : "bg-gray-300 cursor-not-allowed"
-    }`}
+    ${formValidation && !loading
+              ? "bg-green-600 hover:bg-green-700 text-white"
+              : "bg-gray-300 cursor-not-allowed"
+            }`}
         >
           {loading ? (
             <>
@@ -184,12 +183,14 @@ const RegistrationForm = ({ prevStep }: PropType) => {
         {/* Google Signup */}
         <button
           type="button"
-          onClick={()=>signIn("google",{callbackUrl:"/"})}
+          onClick={() => signIn("google", { callbackUrl: "/" })}
           className="w-full border border-gray-300 rounded-xl py-3 flex items-center justify-center gap-3 hover:bg-gray-100 transition"
         >
           <Image
             src="https://www.svgrepo.com/show/475656/google-color.svg"
             alt="Google"
+            width={20}
+            height={20}
             className="w-5 h-5"
           />
           <span className="font-medium text-gray-700">Sign up with Google</span>
@@ -201,7 +202,7 @@ const RegistrationForm = ({ prevStep }: PropType) => {
 
           <LogIn className="h-4 w-4 text-gray-500" />
 
-          <span className="text-green-600 font-semibold cursor-pointer hover:underline" onClick={()=> router.push("/login")}>
+          <span className="text-green-600 font-semibold cursor-pointer hover:underline" onClick={() => router.push("/login")}>
             Sign in here
           </span>
         </p>

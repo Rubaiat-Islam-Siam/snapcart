@@ -100,17 +100,17 @@ function UserOderCard({ order }: { order: IOder }) {
                 {order.assignedDeliveryBoy && typeof order.assignedDeliveryBoy === 'object' && 'name' in order.assignedDeliveryBoy && <>
                     <div className="bg-blue-50 mt-4 rounded-xl p-4 border border-blue-200 flex items-center justify-between">
                         <div className="flex items-center gap-3 text-sm text-gray-700">
-                            <UserCheck className="text-blue-600" size={18}/>
+                            <UserCheck className="text-blue-600" size={18} />
                             <div className="font-semibold text-gray-800">
                                 <p>Assigned to: <span>{order.assignedDeliveryBoy.name}</span></p>
                                 <p className="text-xs text-gray-600">📞 +88{order.assignedDeliveryBoy.mobile}</p>
                             </div>
 
                         </div>
-                        <a href={`tel:${order.assignedDeliveryBoy.mobile}` } className="bg-blue-600 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-blue-700 transition">Call</a>
+                        <a href={`tel:${order.assignedDeliveryBoy.mobile}`} className="bg-blue-600 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-blue-700 transition">Call</a>
                     </div>
-                
-                <button className="w-full items-center justify-center flex gap-2 bg-green-600 text-white font-semibold hover:bg-green-700 rounded-xl shadow transition py-3" onClick={()=> route.push(`/user/track-order/${order._id?.toString()}`)}><Truck/>Track Your Order</button>
+
+                    <button className="w-full items-center justify-center flex gap-2 bg-green-600 text-white font-semibold hover:bg-green-700 rounded-xl shadow transition py-3" onClick={() => route.push(`/user/track-order/${order._id?.toString()}`)}><Truck />Track Your Order</button>
                 </>
                 }
 
@@ -154,6 +154,8 @@ function UserOderCard({ order }: { order: IOder }) {
                                     <Image
                                         src={item.image}
                                         alt={item.name}
+                                        width={56}
+                                        height={56}
                                         className="w-14 h-14 object-cover rounded-lg border self-start"
                                     />
 
