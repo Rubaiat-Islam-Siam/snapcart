@@ -128,88 +128,140 @@ function TrackOrder({ params }: { params: { orderId: string } }) {
     }, [orderId])
 
     return (
-        <div className="w-full min-h-screen bg-linear-to-b from-green-50 via-white to-white"   >
-            <div className="max-w-2xl mx-auto pb-24">
-                <div className="sticky top-0 bg-white/80 backdrop-blur-xl p-4 border-b shadow gap-3 flex items-center z-999">
-                    <button className="p-2 rounded-full bg-green-100" onClick={() => router.back()}><ArrowLeft className="text-green-700" size={20} /> </button>
-                    <div>
-                        <h2 className="font-bold text-xl">Track Order</h2>
-                        <p className="text-gray-500 text-xs">Order ID: #{order?._id?.toString().slice(-6)} <span className="capitalize text-green-600 font-semibold">{order?.status}</span></p>
-                    </div>
+    <div className="w-full min-h-screen bg-gradient-to-br from-emerald-50 via-white to-green-100">
+        <div className="max-w-5xl mx-auto pb-24 px-6">
+            
+            {/* HEADER */}
+            <div className="sticky top-0 backdrop-blur-xl bg-white/60 p-5 border-b border-white/40 shadow-sm flex items-center gap-4 z-50">
+                <button
+                    className="p-3 rounded-full bg-emerald-100 hover:bg-emerald-200 transition-all duration-200 active:scale-95 border-none outline-none"
+                    onClick={() => router.back()}
+                >
+                    <ArrowLeft className="text-emerald-700" size={20} />
+                </button>
 
+                <div>
+                    <h2 className="font-bold text-2xl text-gray-800 tracking-tight">
+                        Track Order
+                    </h2>
+                    <p className="text-gray-500 text-xs mt-1">
+                        Order ID: #{order?._id?.toString().slice(-6)}{" "}
+                        <span className="capitalize text-emerald-600 font-semibold">
+                            {order?.status}
+                        </span>
+                    </p>
                 </div>
-                <div className="mt-10 px-4">
-                    <div className="rounded-3xl overflow-hidden border shadow">
-                        <LiveMap
-                            userLocation={userLocation}
-                            deliveryBoyLocation={deliveryBoyLocation}
-                        />
+            </div>
+
+            <div className="mt-10 px-4 space-y-8">
+                
+                {/* MAP */}
+                <div className="rounded-3xl overflow-hidden shadow-xl border-0">
+                    <LiveMap
+                        userLocation={userLocation}
+                        deliveryBoyLocation={deliveryBoyLocation}
+                    />
+                </div>
+
+                {/* CHAT CARD */}
+                <div className="bg-white/70 backdrop-blur-xl rounded-3xl shadow-2xl border-0 flex flex-col h-[520px] overflow-hidden">
+
+                    {/* CHAT HEADER */}
+                    <div className="px-6 py-5 bg-gradient-to-r from-emerald-100/60 to-green-100/60">
+                        <h3 className="text-lg font-bold text-gray-800">
+                            💬 Chat with Delivery Boy
+                        </h3>
+                        <p className="text-xs text-gray-500 mt-1">
+                            Real-time messaging
+                        </p>
                     </div>
 
-                    <div className="bg-white rounded-3xl shadow-lg border flex flex-col h-[500px]">
-                        <div className="px-6 py-4 border-b bg-gradient-to-r from-green-50 to-emerald-50 rounded-t-3xl">
-                            <h3 className="text-lg font-bold text-gray-800">💬 Chat with Delivery Boy</h3>
-                            <p className="text-xs text-gray-500 mt-1">Real-time messaging</p>
-                        </div>
+                    {/* CHAT BODY */}
+                    <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gradient-to-b from-white/40 to-white/10 scrollbar-hide">
 
-                        <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50">
-                            {messages?.length === 0 ? (
-                                <div className="flex items-center justify-center h-full text-gray-400 text-sm">
-                                    No messages yet. Start the conversation!
-                                </div>
-                            ) : (
-                                <AnimatePresence>
-                                    {messages?.map((msg) => {
-                                        // Handle both populated and non-populated senderId
-                                        const messageSenderId = typeof msg.senderId === 'object' && msg.senderId._id
+                        {messages?.length === 0 ? (
+                            <div className="flex items-center justify-center h-full text-gray-400 text-sm">
+                                No messages yet. Start the conversation!
+                            </div>
+                        ) : (
+                            <AnimatePresence>
+                                {messages?.map((msg) => {
+                                    const messageSenderId =
+                                        typeof msg.senderId === "object" &&
+                                        msg.senderId._id
                                             ? msg.senderId._id.toString()
                                             : msg.senderId.toString()
-                                        const isMyMessage = messageSenderId === userData?._id?.toString()
 
-                                        return (
-                                            <motion.div
-                                                initial={{ opacity: 0, y: 10 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                exit={{ opacity: 0, y: -10 }}
-                                                transition={{ duration: 0.2 }}
-                                                key={msg._id?.toString()}
-                                                className={`flex ${isMyMessage ? "justify-end" : "justify-start"}`}
+                                    const isMyMessage =
+                                        messageSenderId ===
+                                        userData?._id?.toString()
+
+                                    return (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 15 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -15 }}
+                                            transition={{ duration: 0.25 }}
+                                            key={msg._id?.toString()}
+                                            className={`flex ${
+                                                isMyMessage
+                                                    ? "justify-end"
+                                                    : "justify-start"
+                                            }`}
+                                        >
+                                            <div
+                                                className={`px-5 py-3 max-w-[75%] rounded-3xl text-sm shadow-lg transition-all duration-200 border-0
+                                                ${
+                                                    isMyMessage
+                                                        ? "bg-emerald-600 text-white rounded-br-md"
+                                                        : "bg-white text-gray-800 rounded-bl-md"
+                                                }`}
                                             >
-                                                <div className={`px-4 py-3 max-w-[80%] rounded-2xl shadow-md 
-                                                            ${isMyMessage ? "bg-green-600 text-white rounded-br-none" : "bg-white rounded-bl-none text-gray-800 border"}`}>
-                                                    <p className="text-sm font-medium break-words">{msg.text}</p>
-                                                    <p className="text-[11px] opacity-70 mt-1 text-right">{msg.time}</p>
-                                                </div>
-                                            </motion.div>
-                                        )
-                                    })}
-                                </AnimatePresence>
-                            )}
-                            <div ref={messagesEndRef} />
-                        </div>
+                                                <p className="break-words font-medium">
+                                                    {msg.text}
+                                                </p>
+                                                <p className="text-[11px] opacity-70 mt-2 text-right">
+                                                    {msg.time}
+                                                </p>
+                                            </div>
+                                        </motion.div>
+                                    )
+                                })}
+                            </AnimatePresence>
+                        )}
 
-                        <div className="flex gap-3 p-4 border-t bg-white rounded-b-3xl">
-                            <input
-                                type="text"
-                                placeholder="Type your message..."
-                                className="bg-gray-50 px-4 py-3 flex-1 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
-                                value={newMessage}
-                                onChange={(e) => setNewMessage(e.target.value)}
-                                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                            />
-                            <button
-                                className="bg-green-600 text-white px-5 py-3 rounded-xl hover:bg-green-700 transition-colors shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                                onClick={handleSendMessage}
-                                disabled={!newMessage.trim()}
-                            >
-                                <Send size={20} />
-                            </button>
-                        </div>
+                        <div ref={messagesEndRef} />
+                    </div>
+
+                    {/* CHAT INPUT */}
+                    <div className="flex gap-3 p-5 bg-white/80 backdrop-blur-xl">
+                        <input
+                            type="text"
+                            placeholder="Type your message..."
+                            className="flex-1 px-5 py-3 rounded-2xl bg-white shadow-inner text-sm border-none outline-none focus:outline-none focus:ring-0"
+                            value={newMessage}
+                            onChange={(e) =>
+                                setNewMessage(e.target.value)
+                            }
+                            onKeyPress={(e) =>
+                                e.key === "Enter" &&
+                                handleSendMessage()
+                            }
+                        />
+
+                        <button
+                            className="bg-emerald-600 text-white px-6 py-3 rounded-2xl shadow-lg hover:scale-105 active:scale-95 transition-all duration-200 border-none outline-none disabled:opacity-40"
+                            onClick={handleSendMessage}
+                            disabled={!newMessage.trim()}
+                        >
+                            <Send size={20} />
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
-    );
+    </div>
+)
 }
 
 export default TrackOrder;
