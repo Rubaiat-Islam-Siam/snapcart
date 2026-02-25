@@ -25,6 +25,9 @@ export interface IOder {
         longitude: number
         latitude: number
     }
+    deliveryOtp: string | null
+    deliveryOtpVerification: boolean
+    deliveryAt?: Date
     assignment?: mongoose.Types.ObjectId
     assignedDeliveryBoy?: mongoose.Types.ObjectId | IUser
     status: "pending" | "out of delivery" | "delivered" | "cancelled"
@@ -112,6 +115,18 @@ const orderSchema = new mongoose.Schema<IOder>({
     assignedDeliveryBoy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
+    },
+    deliveryOtp: {
+        type: String,
+        default: null
+    },
+    deliveryOtpVerification: {
+        type: Boolean,
+        default: false
+    },
+    deliveryAt: {
+        type: Date,
+        default: null
     },
     createdAt: {
         type: Date,

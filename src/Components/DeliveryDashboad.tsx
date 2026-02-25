@@ -9,6 +9,7 @@ import dynamic from "next/dynamic"
 import { motion } from "framer-motion"
 import { IOder } from "../models/order.model"
 import DeliveryChat from "./DeliveryChat"
+import { Loader2 } from "lucide-react"
 
 const LiveMap = dynamic(() => import("./LiveMap"), { ssr: false })
 
@@ -36,6 +37,11 @@ const DeliveryDashboad = () => {
   const [activeOrder, setActiveOrder] = useState<IPopulatedAssignment | null>(null)
   const [userLocation, setUserLocation] = useState<ILocation | null>({ latitude: 0, longitude: 0 })
   const [deliveryBoyLocation, setDeliveryBoyLocation] = useState<ILocation | null>({ latitude: 0, longitude: 0 })
+  const [showOtpBox, setShowOtpBox] = useState(false)
+  const [otp, setOtp] = useState("")
+  const [otpError, setOtpError] = useState("")
+  const [sendOtpLoading, setSendOtpLoading] = useState(false)
+  const [verifyOtpLoading, setVerifyOtpLoading] = useState(false)
   const [loading, setLoading] = useState(true)
 
   const fetchAssignments = async () => {
@@ -55,15 +61,22 @@ const DeliveryDashboad = () => {
         const order = result.data.assignment
         setActiveOrder(order)
 
+        console.log("Active Order:", order)
+        console.log("Order Address:", order?.order?.address)
+
         if (order?.order?.address?.latitude && order?.order?.address?.longitude) {
-          setUserLocation({
+          const location = {
             latitude: order.order.address.latitude,
             longitude: order.order.address.longitude,
-          })
+          }
+          console.log("Setting user location:", location)
+          setUserLocation(location)
+        } else {
+          console.error("No valid address coordinates found in order")
         }
       }
     } catch (error) {
-      console.log(error)
+      console.log("Error fetching current order:", error)
     }
   }
 
@@ -78,14 +91,14 @@ const DeliveryDashboad = () => {
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
         })
-        socket.emit("delivery-location", {
+        socket.emit("update-location", {
           userId: userData._id,
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
         })
       },
       (err) => {
-        console.log(err)
+        console.log("Geolocation error:", err)
       },
       {
         enableHighAccuracy: true,
@@ -97,7 +110,7 @@ const DeliveryDashboad = () => {
     return () => {
       navigator.geolocation.clearWatch(watchId)
     }
-  })
+  }, [userData?._id])
 
   const handleAccept = async (id: string) => {
     try {
@@ -140,6 +153,35 @@ const DeliveryDashboad = () => {
     }
     init()
   }, [])
+
+  const sentOpt = async () => {
+    try {
+      setSendOtpLoading(true)
+      const result = await axios.post('/api/delivery/otp/send', { orderId: activeOrder?.order._id })
+      console.log(result)
+      setShowOtpBox(true)
+    } catch (error) {
+      setOtpError("Failed to send OTP")
+      console.log(error)
+    } finally {
+      setSendOtpLoading(false)
+    }
+  }
+
+  const verifyOtp = async () => {
+    try {
+      setVerifyOtpLoading(true)
+      const result = await axios.post('/api/delivery/otp/verify', { orderId: activeOrder?.order._id, otp })
+      console.log(result)
+      setActiveOrder(null)
+      setShowOtpBox(false)
+    } catch (error) {
+      setOtpError("Invalid OTP")
+      console.log(error)
+    } finally {
+      setVerifyOtpLoading(false)
+    }
+  }
 
   if (loading) {
   return (
@@ -197,10 +239,31 @@ const DeliveryDashboad = () => {
         />
       </div>
 
-      <DeliveryChat
-        orderId={activeOrder.order._id}
-        deliveryBoyId={userData?._id!}
-      />
+      {userData?._id && (
+        <DeliveryChat
+          orderId={activeOrder.order._id}
+          deliveryBoyId={userData._id}
+        />
+      )}
+      <div className="mt-6 bg-white rounded-xl shadow p-6">
+        {!activeOrder.order.deliveryOtpVerification && !showOtpBox && (
+          <button className="bg-green-600 w-full text-white px-6 py-4 rounded-lg cursor-pointer hover:bg-green-700" onClick={sentOpt} >
+            {sendOtpLoading ? <Loader2 className="animate-spin text-center" /> : "Mark as Delivered"}
+          </button>
+        )}
+
+        {showOtpBox && (
+          <div className="mt-4">
+            <input type="number" placeholder="Enter OTP" className="w-full py-3 rounded-lg text-center shadow-xl" value={otp} onChange={(e) => setOtp(e.target.value)} />
+            {otpError && <p className="text-red-500 text-sm mt-2">{otpError}</p>}
+            <button className="w-full mt-4 bg-blue-600 text-white py-3 rounded-lg" onClick={verifyOtp}>{verifyOtpLoading ? <Loader2 className="animate-spin" /> : "Verify OTP"}</button>
+          </div>
+        )}
+        {activeOrder.order.deliveryOtpVerification && (
+          <p className="text-green-500 text-sm mt-2">Delivery Completed!</p>
+        )}
+        
+      </div>
     </motion.div>
   </div>
 )

@@ -116,7 +116,7 @@ function AdminOrdersCard({ order }: { order: IOder }) {
 
                     <div className="flex items-center gap-3 text-gray-700 text-sm">
                         <User className="text-green-500 shrink-0" size={16} />
-                        <span className="font-medium">{typeof order.user === "object" && "name" in order.user ? order.user.name : "Unknown"}</span>
+                        <span className="font-medium">{typeof order.user === "object" && order.user !== null && "name" in order.user ? order.user.name : "Unknown"}</span>
                     </div>
 
                     <div className="flex items-center gap-3 text-gray-700 text-sm">
@@ -142,7 +142,7 @@ function AdminOrdersCard({ order }: { order: IOder }) {
                     </span>
                 </div>
 
-                {order.assignedDeliveryBoy && typeof order.assignedDeliveryBoy === 'object' && 'name' in order.assignedDeliveryBoy && (
+                {order.assignedDeliveryBoy && typeof order.assignedDeliveryBoy === 'object' && order.assignedDeliveryBoy !== null && 'name' in order.assignedDeliveryBoy && (
                     <div className="bg-blue-50 mt-4 rounded-xl p-4 border border-blue-200 flex items-center justify-between">
                         <div className="flex items-center gap-3 text-sm text-gray-700">
                             <UserCheck className="text-blue-600" size={18}/>

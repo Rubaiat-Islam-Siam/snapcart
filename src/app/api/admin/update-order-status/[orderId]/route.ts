@@ -36,7 +36,7 @@ export async function POST(req: NextRequest, { params }: {
             const nearByIds = nearByDeliveryBoy.map((boy) => boy._id)
             const busyIds = await DeliveryAssignment.find({
                 assignedTo: { $in: nearByIds },
-                status: { $nin: ["assigned", "broadcasted"] }
+                status: { $in: ["assigned", "broadcasted"] }
             }).distinct("assignedTo")
             const busyIdsSet = new Set(busyIds.map(b => String(b)))
             const availableDeliveryBoy = nearByDeliveryBoy.filter((b) => !busyIdsSet.has(String(b._id)))
@@ -58,7 +58,14 @@ export async function POST(req: NextRequest, { params }: {
                 status: "broadcasted"
             })
 
-            await deliveryAssignment.populate("order")
+            await deliveryAssignment.populate({
+                path: "order",
+                populate: {
+                    path: "user",
+                    select: "name email mobile"
+                }
+            })
+            
             for(const boyId of candidates){
                 const boy = await User.findById(boyId)
                 if(boy?.socketId){
@@ -74,7 +81,6 @@ export async function POST(req: NextRequest, { params }: {
                 latitude: b.location?.coordinates[1],
                 longitude: b.location?.coordinates[0]
             }))
-            await deliveryAssignment.populate("order")
 
         }
         order.status = status

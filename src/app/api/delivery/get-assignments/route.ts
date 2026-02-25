@@ -10,7 +10,13 @@ export async function GET() {
         const assignments = await DeliveryAssignment.find({
             broadcastedTo: session?.user?.id,
             status: "broadcasted"
-        }).populate("order")
+        }).populate({
+            path: "order",
+            populate: {
+                path: "user",
+                select: "name email mobile"
+            }
+        })
         return NextResponse.json({ success: true, assignments }, { status: 200 })
     } catch (error) {
         return NextResponse.json({ success: false, message: "Failed to fetch assignments" }, { status: 500 })

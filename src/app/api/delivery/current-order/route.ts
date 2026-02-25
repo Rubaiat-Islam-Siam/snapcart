@@ -12,7 +12,13 @@ export async function GET() {
       assignedTo: deliveryBoyId,
       status: "assigned",
     })
-      .populate({ path: "order", populate: { path: "address" } })
+      .populate({ 
+        path: "order", 
+        populate: [
+          { path: "address" },
+          { path: "user", select: "name email mobile" }
+        ]
+      })
       .lean();
     if (!activeAssignment)
       return NextResponse.json({ active: false }, { status: 200 });

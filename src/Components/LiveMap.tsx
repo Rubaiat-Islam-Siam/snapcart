@@ -4,6 +4,14 @@ import "leaflet/dist/leaflet.css"
 import { useEffect } from "react"
 import { MapContainer, Marker, Polyline, Popup, TileLayer, useMap } from "react-leaflet"
 
+// Fix for default marker icons in Leaflet
+delete (L.Icon.Default.prototype as any)._getIconUrl
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+})
+
 interface ILocation {
     latitude: number
     longitude: number
@@ -27,8 +35,12 @@ function Recenter({ position }: { position: [number, number] }) {
 }
 
 function LiveMap({ userLocation, deliveryBoyLocation }: IProps) {
+    console.log("LiveMap render - userLocation:", userLocation)
+    console.log("LiveMap render - deliveryBoyLocation:", deliveryBoyLocation)
+    
     // Return null or loading state if userLocation is not available
     if (!userLocation || userLocation.latitude === 0 || userLocation.longitude === 0) {
+        console.log("LiveMap: Showing loading state - invalid user location")
         return (
     <div className="w-full h-[520px] rounded-3xl overflow-hidden relative flex items-center justify-center bg-gradient-to-br from-emerald-50 via-white to-green-100 shadow-2xl">
         <div className="flex flex-col items-center gap-3">
@@ -50,6 +62,8 @@ function LiveMap({ userLocation, deliveryBoyLocation }: IProps) {
         iconSize: [40, 40],
     })
     const center = [userLocation.latitude, userLocation.longitude]
+    console.log("LiveMap: Map center coordinates:", center)
+    
     const linePosition: [number, number][] | null = deliveryBoyLocation && deliveryBoyLocation.latitude !== 0 && deliveryBoyLocation.longitude !== 0 ? [
         [deliveryBoyLocation.latitude, deliveryBoyLocation.longitude],
         [userLocation.latitude, userLocation.longitude]
