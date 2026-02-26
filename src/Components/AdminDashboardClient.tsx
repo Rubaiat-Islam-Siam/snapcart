@@ -132,7 +132,6 @@ function AdminDashboardClient({ earnings, stats, chartdata }: Props) {
           <BarChart data={chartdata}>
             <CartesianGrid strokeDasharray="4 4" />
             <XAxis dataKey="date" />
-            <YAxis />
             <Tooltip />
             <Legend />
             <Bar
