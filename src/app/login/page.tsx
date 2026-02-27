@@ -28,6 +28,8 @@ const LoginForm = () => {
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get("callbackUrl") || "/"
 
+  const isValid = email.trim() !== "" && password.trim() !== ""
+
   // Redirect if already authenticated
   useEffect(() => {
     if (session.status === "authenticated") {
@@ -36,7 +38,14 @@ const LoginForm = () => {
     }
   }, [session.status, router, callbackUrl])
 
-  const isValid = email.trim() !== "" && password.trim() !== ""
+  // Show loading while checking session
+  if (session.status === "loading") {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-green-600" />
+      </div>
+    )
+  }
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -53,14 +62,14 @@ const LoginForm = () => {
        
        if (result?.error) {
          setError(result.error)
+         setLoading(false)
        } else if (result?.ok) {
-         router.push(callbackUrl)
-         router.refresh()
+         // Use window.location for hard redirect to ensure session is loaded
+         window.location.href = callbackUrl
        }
     } catch (err) {
       console.log(err)
       setError("An unexpected error occurred")
-    } finally {
       setLoading(false)
     }
   }
@@ -68,16 +77,8 @@ const LoginForm = () => {
   const handleGoogleSignIn = async () => {
     setLoading(true)
     setError("")
-    await signIn("google", { callbackUrl })
-  }
-
-  // Show loading if session is loading or authenticated
-  if (session.status === "loading" || session.status === "authenticated") {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-green-600" />
-      </div>
-    )
+    // Don't await - let Google handle the redirect
+    signIn("google", { callbackUrl })
   }
 
   return (

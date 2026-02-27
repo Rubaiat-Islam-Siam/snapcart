@@ -6,7 +6,6 @@ import bcrypt from "bcryptjs";
 import Google from "next-auth/providers/google";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  trustHost: true,
   providers: [
     Credentials({
       credentials: {
@@ -85,6 +84,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
   pages: {
     signIn: "/login",
+    error: "/login"
   },
 
   session: {
