@@ -7,7 +7,6 @@ import {
   CartesianGrid,
   ResponsiveContainer,
   XAxis,
-  YAxis,
   Tooltip,
   Legend,
   Bar,
@@ -78,7 +77,7 @@ function AdminDashboardClient({ earnings, stats, chartdata }: Props) {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-3xl p-8 shadow-xl text-center"
+        className="bg-linear-to-r from-green-500 to-emerald-600 text-white rounded-3xl p-8 shadow-xl text-center"
       >
         <h2 className="text-lg font-medium opacity-90 mb-3">{title}</h2>
         <p className="text-5xl font-bold">

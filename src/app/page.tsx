@@ -9,7 +9,7 @@ import AdminDashboard from "../Components/AdminDashboard";
 import GeoUpdater from "../Components/GeoUpdater";
 import Delivery from "../Components/Delivery";
 import Grocery, { IGrocery } from "../models/grocery.model";
-
+import Footer from "../Components/Footer";
 
 export default async function Home(props: {
   searchParams: Promise<{ search?: string }>;
@@ -54,7 +54,8 @@ export default async function Home(props: {
         user.role=="admin"?(
           <AdminDashboard/>
         ) : <Delivery/>
-       }
+       } 
+       <Footer/>
     </div>
   );
 }
