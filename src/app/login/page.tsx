@@ -9,13 +9,14 @@ import {
   Mail,
   Loader2
 } from "lucide-react"
-import React, { useState } from "react"
+import React, { useState, Suspense } from "react"
 import { motion } from "framer-motion"
 import { useRouter, useSearchParams } from "next/navigation"
 import { signIn, useSession } from "next-auth/react"
+import Image from "next/image"
 
 
-const LoginPage = () => {
+const LoginForm = () => {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
@@ -156,9 +157,11 @@ const LoginPage = () => {
           onClick={()=> signIn("google",{callbackUrl:"/"})}
           className="w-full border border-gray-300 rounded-xl py-3 flex items-center justify-center gap-3 hover:bg-gray-100 transition disabled:opacity-60"
         >
-          <img
+          <Image
             src="https://www.svgrepo.com/show/475656/google-color.svg"
             alt="Google"
+            width={20}
+            height={20}
             className="w-5 h-5"
           />
           <span className="font-medium text-gray-700">
@@ -177,6 +180,18 @@ const LoginPage = () => {
 
       </form>
     </div>
+  )
+}
+
+const LoginPage = () => {
+  return (
+    <Suspense fallback={
+      <div className="flex justify-center items-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-green-600" />
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   )
 }
 

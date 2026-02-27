@@ -19,7 +19,7 @@ interface ILocation {
     latitude: number
 }
 
-function TrackOrder({ params }: { params: { orderId: string } }) {
+function TrackOrder(context: {params: Promise<{ orderId: string }>}) {
     const { orderId } = useParams() as { orderId: string }
     const { userData } = useSelector((state: RootState) => state.user)
     const [order, setOrder] = useState<IOder | null>(null)
