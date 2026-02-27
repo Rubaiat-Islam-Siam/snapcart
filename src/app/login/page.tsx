@@ -57,6 +57,18 @@ const LoginForm = () => {
     }
   }
 
+  const handleGoogleSignIn = async () => {
+    try {
+      setLoading(true)
+      setError("")
+      await signIn("google", { callbackUrl })
+    } catch (err) {
+      console.log(err)
+      setError("Google sign-in failed")
+      setLoading(false)
+    }
+  }
+
   return (
     <div className="flex flex-col justify-center items-center min-h-screen px-6 py-10 bg-white">
 
@@ -154,7 +166,7 @@ const LoginForm = () => {
         <button
           type="button"
           disabled={loading}
-          onClick={()=> signIn("google",{callbackUrl:"/"})}
+          onClick={handleGoogleSignIn}
           className="w-full border border-gray-300 rounded-xl py-3 flex items-center justify-center gap-3 hover:bg-gray-100 transition disabled:opacity-60"
         >
           <Image
