@@ -30,18 +30,33 @@ function ViewGrocery() {
     const [backendImage, setBackendImage] = useState<Blob | null>(null)
     const [loading, setLoading] = useState(false)
     const [deleteLoading, setDeleteLoading] = useState(false)
+    const [search,setSearch] = useState("")
+    const [filter,setFilter] = useState<IGrocery[]>([])
     const router = useRouter()
     useEffect(() => {
         const getGrocery = async () => {
             try {
                 const res = await axios.get("/api/admin/get-grocery")
                 setGroceries(res.data.groceries)
+                setFilter(res.data.groceries)
             } catch (error) {
                 console.log(error)
             }
         }
         getGrocery()
     }, [])
+
+    useEffect(() => {
+        if (search.trim() === "") {
+            setFilter(groceries)
+        } else {
+            const q = search.toLowerCase()
+            setFilter(groceries.filter((g) => 
+                g.name.toLowerCase().includes(q) || 
+                g.category.toLowerCase().includes(q)
+            ))
+        }
+    }, [search, groceries])
 
     useEffect(() => {
         if (editing) {
@@ -67,7 +82,7 @@ function ViewGrocery() {
             formData.append("price", editing?.price || "")
             formData.append("unit", editing?.unit || "")
             formData.append("image", backendImage || "")
-            const res = await axios.post("/api/admin/edit-grocery", formData)
+            await axios.post("/api/admin/edit-grocery", formData)
             window.location.reload()
         } catch (error) {
             console.log(error)
@@ -81,7 +96,7 @@ function ViewGrocery() {
         if (!editing) return
         try {
             
-            const res = await axios.post("/api/admin/delete-grocery", {groceryId:editing?._id?.toString() || ""})
+            await axios.post("/api/admin/delete-grocery", {groceryId:editing?._id?.toString() || ""})
             window.location.reload()
         } catch (error) {
             console.log(error)
@@ -89,6 +104,7 @@ function ViewGrocery() {
             setDeleteLoading(false)
         }
     }
+
     return (
   <div className="pt-10 w-[95%] md:w-[85%] mx-auto pb-24">
 
@@ -114,7 +130,7 @@ function ViewGrocery() {
     </motion.div>
 
     {/* SEARCH */}
-    <motion.form
+    <motion.div
       initial={{ opacity: 0, y: 80 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
@@ -124,13 +140,15 @@ function ViewGrocery() {
       <input
         type="text"
         placeholder="Search by Name or Category..."
+        value={search}
+        onChange={(e)=>setSearch(e.target.value)}
         className="outline-none w-full text-gray-700 placeholder-gray-400 bg-transparent"
       />
-    </motion.form>
+    </motion.div>
 
     {/* GROCERY LIST */}
     <div className="space-y-6">
-      {groceries.map((grocery, index) => (
+      {filter.map((grocery, index) => (
         <motion.div
           key={index}
           whileHover={{ scale: 1.02 }}

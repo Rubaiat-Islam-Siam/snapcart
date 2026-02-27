@@ -6,12 +6,16 @@ import EditRoleMobile from "../Components/EditRoleMobile";
 import Nav from "../Components/Nav";
 import UserDashboard from "../Components/UserDashboard";
 import AdminDashboard from "../Components/AdminDashboard";
-import DeliveryDashboad from "../Components/DeliveryDashboad";
 import GeoUpdater from "../Components/GeoUpdater";
 import Delivery from "../Components/Delivery";
+import Grocery, { IGrocery } from "../models/grocery.model";
 
 
-export default async function Home() {
+export default async function Home(props: {
+  searchParams: Promise<{ search?: string }>;
+}) {
+
+  const searchParams = await props.searchParams
   await connectDb()
   const session = await auth();
   const user = await User.findById(session?.user?.id)
@@ -25,12 +29,27 @@ export default async function Home() {
 
   const plainUser = JSON.parse(JSON.stringify(user))
   console.log(plainUser)
+
+  let groceryList:IGrocery[] = []
+  if(user.role == "user"){
+    if(searchParams.search){
+      groceryList = await Grocery.find({
+        $or: [
+          { name: { $regex: searchParams.search, $options: "i" } },
+          { category: { $regex: searchParams.search, $options: "i" } },
+        ],
+      }).lean()
+    } else {
+      groceryList = await Grocery.find({}).lean()
+    }
+  }
+  
   return (
     <div>
        <Nav user={plainUser}/>
        <GeoUpdater userId={plainUser._id}/>
        {user.role == "user"?(
-        <UserDashboard/>
+        <UserDashboard groceryList={groceryList}/>
        ):
         user.role=="admin"?(
           <AdminDashboard/>

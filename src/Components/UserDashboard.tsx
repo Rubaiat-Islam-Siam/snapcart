@@ -1,12 +1,9 @@
 import React from 'react'
 import UserDashboardClient from './UserDashboardClient'
-import connectDb from '../lib/db'
-import Grocery from '../models/grocery.model'
+import { IGrocery } from '../models/grocery.model'
 
-async function UserDashboard() {
-  await connectDb()
-  const groceries = await Grocery.find({})
-  const plainGrocery = JSON.parse(JSON.stringify(groceries))
+async function UserDashboard({groceryList}: {groceryList: IGrocery[]}) {
+  const plainGrocery = JSON.parse(JSON.stringify(groceryList))
 
   return <UserDashboardClient groceries={plainGrocery} />
 }

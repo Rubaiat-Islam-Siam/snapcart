@@ -10,6 +10,7 @@ import { signOut } from "next-auth/react";
 import { createPortal } from "react-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
+import { useRouter } from "next/navigation";
 
 
 interface IUser {
@@ -26,10 +27,11 @@ const Nav = ({ user }: { user: IUser }) => {
   const [open, setOpen] = useState(false);
   const [searchBarOpen, setSearchBarOpen] = useState(false);
   const [menuOpen,setMenuOpen] = useState(false)
-  const [loading,setLoading] = useState(false)
+  const [search, setSearch] = useState("")
   const profileDropDown = useRef<HTMLDivElement>(null);
   const {cartData} = useSelector((state:RootState)=>state.cart)
-  
+  const router = useRouter()
+  const debounceTimer = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -44,6 +46,31 @@ const Nav = ({ user }: { user: IUser }) => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    const query = search.trim();
+    if(!query) return router.push("/")
+    router.push(`/?search=${encodeURIComponent(query)}`)
+  }
+
+  const handleSearchChange = (value: string) => {
+    setSearch(value)
+    
+    // Clear existing timer
+    if (debounceTimer.current) {
+      clearTimeout(debounceTimer.current)
+    }
+    
+    // Set new timer for debounced search
+    debounceTimer.current = setTimeout(() => {
+      if (value.trim()) {
+        router.push(`/?search=${encodeURIComponent(value.trim())}`, { scroll: false })
+      } else {
+        router.push("/", { scroll: false })
+      }
+    }, 300)
+  }
 
   const slideBar = menuOpen?createPortal(
     <AnimatePresence>
@@ -104,11 +131,13 @@ const Nav = ({ user }: { user: IUser }) => {
       </Link>
 
       {user.role =="user" && 
-        <form className="hidden md:flex items-center bg-white rounded-full px-4 py-2 w-1/2 max-w-lg shadow-md">
+        <form className="hidden md:flex items-center bg-white rounded-full px-4 py-2 w-1/2 max-w-lg shadow-md" onSubmit={handleSearch}>
         <Search className="text-gray-500 w-5 h-5 mr-2" />
         <input
           type="text"
           placeholder="Search groceries..."
+          value={search}
+          onChange={(e)=>handleSearchChange(e.target.value)}
           className="w-full outline-none text-gray-700 placeholder-gray-400"
         />
       </form>
@@ -125,7 +154,7 @@ const Nav = ({ user }: { user: IUser }) => {
           {searchBarOpen ? (
             <X className="text-green-600 w-6 h-6" />
           ) : (
-            <Search className="text-green-600 w-6 h-6" />
+            <Search className="text-green-600 w-6 h-6"  />
           )}
         </div>
 
@@ -178,7 +207,7 @@ const Nav = ({ user }: { user: IUser }) => {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: -10, scale: 0.95 }}
                 transition={{ duration: 0.2, ease: "easeOut" }}
-                className="absolute right-0 mt-3 w-64 bg-white rounded-2xl shadow-xl border border-gray-200 p-2 z-[999]"
+                className="absolute right-0 mt-3 w-64 bg-white rounded-2xl shadow-xl border border-gray-200 p-2 z-999"
               >
                 <div className="flex items-center gap-3 px-3 py-3 border-b border-gray-100">
                   <div className="w-10 h-10 rounded-full bg-green-100 relative overflow-hidden flex items-center justify-center border border-green-200">
@@ -237,11 +266,13 @@ const Nav = ({ user }: { user: IUser }) => {
                 className="fixed top-24 left-1/2 -translate-x-1/2 w-[90%] bg-white rounded-full shadow-lg z-40 flex items-center px-4 py-2"
               >
                 <Search className="text-gray-500 w-5 h-5 mr-2" />
-                <form className="grow">
+                <form className="grow" onSubmit={handleSearch}>
                   <input
                     type="text"
                     className="w-full outline-none text-gray-700"
                     placeholder="Search Groceries..."
+                    value={search}
+                    onChange={(e)=>handleSearchChange(e.target.value)}
                   />
                 </form>
                 <button className="" onClick={() => setSearchBarOpen(false)}>

@@ -10,6 +10,7 @@ import { motion } from "framer-motion"
 import { IOder } from "../models/order.model"
 import DeliveryChat from "./DeliveryChat"
 import { Loader2 } from "lucide-react"
+import { Bar, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis,BarChart } from "recharts"
 
 const LiveMap = dynamic(() => import("./LiveMap"), { ssr: false })
 
@@ -30,7 +31,7 @@ interface IPopulatedAssignment {
   updatedAt?: Date
 }
 
-const DeliveryDashboad = () => {
+const DeliveryDashboad = ({earning}: {earning: number}) => {
   const { userData } = useSelector((state: RootState) => state.user)
 
   const [assignments, setAssignments] = useState<IPopulatedAssignment[]>([])
@@ -43,6 +44,14 @@ const DeliveryDashboad = () => {
   const [sendOtpLoading, setSendOtpLoading] = useState(false)
   const [verifyOtpLoading, setVerifyOtpLoading] = useState(false)
   const [loading, setLoading] = useState(true)
+
+  const todaysEarnings = [
+    {
+      name: "Today",
+      earning,
+      deliveries: earning / 60
+    }
+  ]
 
   const fetchAssignments = async () => {
     try {
@@ -175,6 +184,7 @@ const DeliveryDashboad = () => {
       console.log(result)
       setActiveOrder(null)
       setShowOtpBox(false)
+      window.location.reload()
     } catch (error) {
       setOtpError("Invalid OTP")
       console.log(error)
@@ -185,7 +195,7 @@ const DeliveryDashboad = () => {
 
   if (loading) {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 via-white to-green-100">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-emerald-50 via-white to-green-100">
       <div className="flex flex-col items-center gap-4">
         <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
         <motion.div
@@ -202,7 +212,7 @@ const DeliveryDashboad = () => {
 
   if (activeOrder && userLocation && userLocation.latitude !== 0 && userLocation.longitude !== 0) {
     return (
-  <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-green-100 pt-[120px] px-6 pb-10">
+  <div className="min-h-screen bg-linear-to-br from-emerald-50 via-white to-green-100 pt-20 px-6 pb-10">
     <motion.div
       initial={{ opacity: 0, y: 40 }}
       animate={{ opacity: 1, y: 0 }}
@@ -270,7 +280,7 @@ const DeliveryDashboad = () => {
   }
 
   return (
-  <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-emerald-50 px-6 pb-16">
+  <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-emerald-50 px-6 pb-16">
     <div className="max-w-6xl mx-auto">
       
       <motion.h2
@@ -286,6 +296,30 @@ const DeliveryDashboad = () => {
           No new assignments available
         </div>
       )}
+
+      <div className="bg-white border rounded-xl shadow-xl p-6">
+        <h3 className="text-sm text-gray-500 uppercase tracking-wide">
+          Today&apos;s Earnings
+        </h3>
+        <p className="text-3xl font-bold text-emerald-600 mt-2">
+          ${earning.toFixed(2)}
+        </p>
+        <ResponsiveContainer width="100%" height={320}>
+                  <BarChart data={todaysEarnings}>
+                    <CartesianGrid strokeDasharray="4 4" />
+                    <XAxis dataKey="date" />
+                    <Tooltip />
+                    <Legend />
+                    <Bar
+                      dataKey="orders"
+                      fill="#16a34a"
+                      radius={[8, 8, 0, 0]}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+                <p className="mt-4 text-lg font-bold text-green-600 ">${earning || 0} Earned Today</p>
+                <button className="mt-4 w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg" onClick={()=>window.location.reload()}>Refresh Earning</button>
+      </div>
 
       <div className="grid md:grid-cols-2 gap-10">
         {assignments.map((a, index) => (
@@ -311,7 +345,7 @@ const DeliveryDashboad = () => {
               </span>
             </div>
 
-            <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-5 text-gray-700 text-sm mb-8">
+            <div className="bg-linear-to-br from-gray-50 to-gray-100 rounded-2xl p-5 text-gray-700 text-sm mb-8">
               📍 {a.order?.address?.fulladdress}
             </div>
 
