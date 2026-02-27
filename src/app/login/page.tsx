@@ -9,7 +9,7 @@ import {
   Mail,
   Loader2
 } from "lucide-react"
-import React, { useState, Suspense } from "react"
+import React, { useState, Suspense, useEffect } from "react"
 import { motion } from "framer-motion"
 import { useRouter, useSearchParams } from "next/navigation"
 import { signIn, useSession } from "next-auth/react"
@@ -27,6 +27,14 @@ const LoginForm = () => {
   const router = useRouter()
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get("callbackUrl") || "/"
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (session.status === "authenticated") {
+      router.push(callbackUrl)
+      router.refresh()
+    }
+  }, [session.status, router, callbackUrl])
 
   const isValid = email.trim() !== "" && password.trim() !== ""
 
@@ -58,15 +66,18 @@ const LoginForm = () => {
   }
 
   const handleGoogleSignIn = async () => {
-    try {
-      setLoading(true)
-      setError("")
-      await signIn("google", { callbackUrl })
-    } catch (err) {
-      console.log(err)
-      setError("Google sign-in failed")
-      setLoading(false)
-    }
+    setLoading(true)
+    setError("")
+    await signIn("google", { callbackUrl })
+  }
+
+  // Show loading if session is loading or authenticated
+  if (session.status === "loading" || session.status === "authenticated") {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-green-600" />
+      </div>
+    )
   }
 
   return (
