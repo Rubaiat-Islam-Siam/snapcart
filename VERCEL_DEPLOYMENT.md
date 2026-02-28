@@ -82,6 +82,13 @@ After redeployment:
 - Make sure you selected all environments (Production, Preview, Development)
 - Redeploy after adding variables (they don't apply to existing deployments)
 
+### Issue: ENOENT: no such file or directory, middleware.js.nft.json
+**Solution**: 
+- This error occurs when middleware is re-exported from another file
+- The middleware logic must be directly in the root `middleware.ts` file
+- ✅ Fixed: Moved middleware logic from `src/proxy.ts` to root `middleware.ts`
+- Do not use re-export pattern like `export { proxy as middleware } from "./src/proxy"`
+
 ## Code Changes Already Made
 
 ✅ Added `trustHost: true` to auth configuration (required for NextAuth v5 on Vercel)
