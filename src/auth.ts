@@ -54,17 +54,36 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             image: user.image
           })
         }
-        user.id = dbUser._id.toString()
-        user.role = dbUser.role
       }
       return true
     },
-    jwt({token,user,trigger,session}) {
+    async jwt({token,user,trigger,session,account}) {
+        // If user is provided (initial sign-in), use that data
         if(user){
-            token.id = user.id,
-            token.name = user.name,
-            token.email = user.email,
+            token.id = user.id
+            token.name = user.name
+            token.email = user.email
             token.role = user.role
+        }
+
+        // For Google sign-in, fetch user from database
+        if(account?.provider === "google") {
+          await connectDb()
+          const dbUser = await User.findOne({email: token.email})
+          if(dbUser) {
+            token.id = dbUser._id.toString()
+            token.role = dbUser.role
+          }
+        }
+
+        // If token still doesn't have id but has email, fetch from database
+        if(!token.id && token.email) {
+          await connectDb()
+          const dbUser = await User.findOne({email: token.email})
+          if(dbUser) {
+            token.id = dbUser._id.toString()
+            token.role = dbUser.role
+          }
         }
 
         if(trigger=="update")

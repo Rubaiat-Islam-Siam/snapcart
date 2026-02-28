@@ -190,6 +190,8 @@ function AdminOrdersCard({ order }: { order: IOder }) {
                                             <Image
                                                 src={item.image}
                                                 alt={item.name}
+                                                width={56}
+                                                height={56}
                                                 className="w-14 h-14 object-cover rounded-lg border self-start"
                                             />
 

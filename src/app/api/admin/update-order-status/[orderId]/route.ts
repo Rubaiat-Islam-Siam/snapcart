@@ -36,7 +36,7 @@ export async function POST(req: NextRequest, { params }: {
             const nearByIds = nearByDeliveryBoy.map((boy) => boy._id)
             const busyIds = await DeliveryAssignment.find({
                 assignedTo: { $in: nearByIds },
-                status: { $in: ["assigned", "broadcasted"] }
+                status: "assigned"
             }).distinct("assignedTo")
             const busyIdsSet = new Set(busyIds.map(b => String(b)))
             const availableDeliveryBoy = nearByDeliveryBoy.filter((b) => !busyIdsSet.has(String(b._id)))
@@ -83,7 +83,7 @@ export async function POST(req: NextRequest, { params }: {
             }))
 
         }
-        order.status = status
+        if (status) order.status = status
         await order.save()
         await order.populate("user")
         await emitEventHandler("order-status-update", {

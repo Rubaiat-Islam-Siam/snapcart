@@ -9,7 +9,7 @@ import {
   Mail,
   Loader2
 } from "lucide-react"
-import React, { useState, Suspense, useEffect } from "react"
+import React, { useState, Suspense } from "react"
 import { motion } from "framer-motion"
 import { useRouter, useSearchParams } from "next/navigation"
 import { signIn, useSession } from "next-auth/react"
@@ -30,23 +30,6 @@ const LoginForm = () => {
 
   const isValid = email.trim() !== "" && password.trim() !== ""
 
-  // Redirect if already authenticated
-  useEffect(() => {
-    if (session.status === "authenticated") {
-      router.push(callbackUrl)
-      router.refresh()
-    }
-  }, [session.status, router, callbackUrl])
-
-  // Show loading while checking session
-  if (session.status === "loading") {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-green-600" />
-      </div>
-    )
-  }
-
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -62,23 +45,16 @@ const LoginForm = () => {
        
        if (result?.error) {
          setError(result.error)
-         setLoading(false)
        } else if (result?.ok) {
-         // Use window.location for hard redirect to ensure session is loaded
-         window.location.href = callbackUrl
+         router.push(callbackUrl)
+         router.refresh()
        }
     } catch (err) {
       console.log(err)
       setError("An unexpected error occurred")
+    } finally {
       setLoading(false)
     }
-  }
-
-  const handleGoogleSignIn = async () => {
-    setLoading(true)
-    setError("")
-    // Don't await - let Google handle the redirect
-    signIn("google", { callbackUrl })
   }
 
   return (
@@ -178,7 +154,7 @@ const LoginForm = () => {
         <button
           type="button"
           disabled={loading}
-          onClick={handleGoogleSignIn}
+          onClick={()=> signIn("google",{callbackUrl: callbackUrl})}
           className="w-full border border-gray-300 rounded-xl py-3 flex items-center justify-center gap-3 hover:bg-gray-100 transition disabled:opacity-60"
         >
           <Image
