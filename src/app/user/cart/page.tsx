@@ -101,7 +101,7 @@ function CartPage() {
                             whileTap={{scale:0.95}}
                             className="w-full bg-green-600 text-white px-4 py-2 rounded-full hover:bg-green-700 font-semibold flex items-center justify-center gap-2 mt-8" onClick={()=>router.push("/user/checkout")}
                             >
-                                <Link href="/user/checkout">Proceed to Checkout</Link>
+                                Proceed to Checkout
                             </motion.button>
                         </motion.div>
                     </div>

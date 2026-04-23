@@ -1,4 +1,3 @@
-import { redirect } from "next/navigation";
 import { auth } from "../auth";
 import connectDb from "../lib/db";
 import User from "../models/user.model";
@@ -18,9 +17,30 @@ export default async function Home(props: {
   const searchParams = await props.searchParams
   await connectDb()
   const session = await auth();
-  const user = await User.findById(session?.user?.id)
-  if(!user)
-    redirect("/login")
+  const user = session?.user?.id ? await User.findById(session.user.id) : null
+
+  // If not logged in, show public storefront with groceries only
+  if(!user) {
+    let groceryList:IGrocery[] = []
+    if(searchParams.search){
+      groceryList = await Grocery.find({
+        $or: [
+          { name: { $regex: searchParams.search, $options: "i" } },
+          { category: { $regex: searchParams.search, $options: "i" } },
+        ],
+      }).lean()
+    } else {
+      groceryList = await Grocery.find({}).lean()
+    }
+
+    return (
+      <div>
+        <Nav/>
+        <UserDashboard groceryList={groceryList}/>
+        <Footer/>
+      </div>
+    )
+  }
 
   const inComplete = !user.mobile || !user.role || (!user.mobile && user.role=="user")
 

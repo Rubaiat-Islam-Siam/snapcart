@@ -23,7 +23,7 @@ interface IUser {
   image?: string;
 }
 
-const Nav = ({ user }: { user: IUser }) => {
+const Nav = ({ user }: { user?: IUser | null }) => {
   const [open, setOpen] = useState(false);
   const [searchBarOpen, setSearchBarOpen] = useState(false);
   const [menuOpen,setMenuOpen] = useState(false)
@@ -72,7 +72,7 @@ const Nav = ({ user }: { user: IUser }) => {
     }, 300)
   }
 
-  const slideBar = menuOpen?createPortal(
+  const slideBar = (menuOpen && user)?createPortal(
     <AnimatePresence>
       <motion.div
       initial={{x:-100,opacity:0}}
@@ -130,7 +130,7 @@ const Nav = ({ user }: { user: IUser }) => {
         Snapcart
       </Link>
 
-      {user.role =="user" && 
+      {(!user || user.role =="user") && 
         <form className="hidden md:flex items-center bg-white rounded-full px-4 py-2 w-1/2 max-w-lg shadow-md" onSubmit={handleSearch}>
         <Search className="text-gray-500 w-5 h-5 mr-2" />
         <input
@@ -145,7 +145,7 @@ const Nav = ({ user }: { user: IUser }) => {
 
       <div className="flex items-center gap-3 md:gap-6 relative">
 
-        {user.role == "user" && 
+        {(!user || user.role == "user") && 
           <>
             <div
           className="bg-white rounded-full w-11 h-11 flex items-center justify-center shadow-md hover:scale-105 transition md:hidden cursor-pointer"
@@ -170,7 +170,7 @@ const Nav = ({ user }: { user: IUser }) => {
           </>
         }
         
-        {user.role == "admin" && 
+        {user?.role == "admin" && 
         <>
           <div className="hidden md:flex items-center gap-4">
             <Link href={"/admin/add-grocery"} className="flex items-center gap-2 bg-white text-green-700 font-semibold px-4 py-2 rounded-full hover:bg-green-100 transition-all"><Plus className='w-5 h-5'/> Add Grocery</Link>
@@ -184,77 +184,88 @@ const Nav = ({ user }: { user: IUser }) => {
         }
 
         <div className="relative" ref={profileDropDown}>
-          <div
-            className="bg-white rounded-full w-11 h-11 flex items-center justify-center overflow-hidden shadow-md hover:scale-105 transition-transform relative cursor-pointer"
-            onClick={() => setOpen((prev) => !prev)}
-          >
-            {user.image ? (
-              <Image
-                src={user.image}
-                alt="user"
-                fill
-                className="object-cover"
-              />
-            ) : (
-              <User className="h-5 w-5 text-green-500"/>
-            )}
-          </div>
-
-          <AnimatePresence>
-            {open && (
-              <motion.div
-                initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                transition={{ duration: 0.2, ease: "easeOut" }}
-                className="absolute right-0 mt-3 w-64 bg-white rounded-2xl shadow-xl border border-gray-200 p-2 z-999"
+          {user ? (
+            <>
+              <div
+                className="bg-white rounded-full w-11 h-11 flex items-center justify-center overflow-hidden shadow-md hover:scale-105 transition-transform relative cursor-pointer"
+                onClick={() => setOpen((prev) => !prev)}
               >
-                <div className="flex items-center gap-3 px-3 py-3 border-b border-gray-100">
-                  <div className="w-10 h-10 rounded-full bg-green-100 relative overflow-hidden flex items-center justify-center border border-green-200">
-                    {user.image ? (
-                      <Image
-                        src={user.image}
-                        alt="user"
-                        fill
-                        className="object-cover"
-                      />
-                    ) : (
-                      <User className="h-5 w-5 text-green-500" />
-                    )}
-                  </div>
+                {user.image ? (
+                  <Image
+                    src={user.image}
+                    alt="user"
+                    fill
+                    className="object-cover"
+                  />
+                ) : (
+                  <User className="h-5 w-5 text-green-500"/>
+                )}
+              </div>
 
-                  <div>
-                    <div className="font-semibold text-gray-800">
-                      {user.name}
-                    </div>
-                    <div className="text-xs text-gray-500 capitalize">
-                      {user.role}
-                    </div>
-                  </div>
-                </div>
+              <AnimatePresence>
+                {open && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                    transition={{ duration: 0.2, ease: "easeOut" }}
+                    className="absolute right-0 mt-3 w-64 bg-white rounded-2xl shadow-xl border border-gray-200 p-2 z-999"
+                  >
+                    <div className="flex items-center gap-3 px-3 py-3 border-b border-gray-100">
+                      <div className="w-10 h-10 rounded-full bg-green-100 relative overflow-hidden flex items-center justify-center border border-green-200">
+                        {user.image ? (
+                          <Image
+                            src={user.image}
+                            alt="user"
+                            fill
+                            className="object-cover"
+                          />
+                        ) : (
+                          <User className="h-5 w-5 text-green-500" />
+                        )}
+                      </div>
 
-                {user.role == "user" && <Link
-                  href="/user/my-orders"
-                  onClick={() => setOpen(false)}
-                  className="flex items-center gap-2 px-3 py-3 hover:bg-green-50 rounded-lg"
-                >
-                  <Package className="w-5 h-5 text-green-600" />
-                  My Orders
-                </Link>}
-                
-                <button
-                  onClick={() => {
-                    setOpen(false);
-                    signOut({ callbackUrl: "/login" });
-                  }}
-                  className="flex items-center gap-2 w-full px-3 py-3 hover:bg-red-50 rounded-lg"
-                >
-                  <LogOut className="w-5 h-5 text-red-600" />
-                  Log Out
-                </button>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                      <div>
+                        <div className="font-semibold text-gray-800">
+                          {user.name}
+                        </div>
+                        <div className="text-xs text-gray-500 capitalize">
+                          {user.role}
+                        </div>
+                      </div>
+                    </div>
+
+                    {user.role == "user" && <Link
+                      href="/user/my-orders"
+                      onClick={() => setOpen(false)}
+                      className="flex items-center gap-2 px-3 py-3 hover:bg-green-50 rounded-lg"
+                    >
+                      <Package className="w-5 h-5 text-green-600" />
+                      My Orders
+                    </Link>}
+                    
+                    <button
+                      onClick={() => {
+                        setOpen(false);
+                        signOut({ callbackUrl: "/login" });
+                      }}
+                      className="flex items-center gap-2 w-full px-3 py-3 hover:bg-red-50 rounded-lg"
+                    >
+                      <LogOut className="w-5 h-5 text-red-600" />
+                      Log Out
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </>
+          ) : (
+            <Link
+              href="/login"
+              className="bg-white text-green-700 font-semibold px-5 py-2 rounded-full hover:bg-green-100 transition-all shadow-md"
+            >
+              Login
+            </Link>
+          )}
 
           <AnimatePresence>
             {searchBarOpen && (

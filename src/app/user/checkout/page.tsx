@@ -8,11 +8,13 @@ import { RootState } from "@/src/redux/store"
 import { useEffect, useState } from "react"
 import axios from "axios"
 import dynamic from "next/dynamic"
+import { useSession } from "next-auth/react"
 const CheckoutMap = dynamic(() => import('@/src/Components/CheckoutMap'), {ssr: false})
 
 
 function Checkout() {
     const router = useRouter()
+    const { status } = useSession()
     
     const [searchQuery, setSearchQuery] = useState("")
     const { userData } = useSelector((state: RootState) => state.user)
@@ -263,6 +265,10 @@ function Checkout() {
                     <motion.button
                         whileTap={{ scale: 0.95 }}
                         className="w-full bg-green-600 text-white py-3 rounded-full hover:bg-green-700 transition-all font-semibold mt-6" onClick={() => {
+                            if (status !== "authenticated") {
+                                router.push("/login?callbackUrl=/user/checkout")
+                                return
+                            }
                             if (paymentMethod == "cod") {
                                 handleCod()
                             } else {

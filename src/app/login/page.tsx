@@ -7,13 +7,15 @@ import {
   Lock,
   LogIn,
   Mail,
-  Loader2
+  Loader2,
+  ArrowLeft
 } from "lucide-react"
 import React, { useState, Suspense } from "react"
 import { motion } from "framer-motion"
 import { useRouter, useSearchParams } from "next/navigation"
 import { signIn, useSession } from "next-auth/react"
 import Image from "next/image"
+import Link from "next/link"
 
 
 const LoginForm = () => {
@@ -58,7 +60,15 @@ const LoginForm = () => {
   }
 
   return (
-    <div className="flex flex-col justify-center items-center min-h-screen px-6 py-10 bg-white">
+    <div className="relative flex flex-col justify-center items-center min-h-screen px-6 py-10 bg-white">
+    
+    {/* Back Button - Top Left */}
+    <Link
+      href="/"
+      className="absolute top-8 left-12 text-green-600 hover:text-green-700 font-semibold flex items-center gap-2"
+    >
+      <ArrowLeft /> Back to Home
+    </Link>
 
       {/* Title */}
       <motion.h1
